@@ -40,7 +40,7 @@ Pace is the speed for that stroke, which in rowing typically is described as the
 
 ## Drag factor
 
-THe drag factor is how much drag the flywheel is generating, which for air rowers typically can be set using a lever at the flywheel. This is NOT a resistance lever, where you excel when it it at its highest. It is more like a gear on a bike, where [the choice for the optimal drag factor is an individual choice](https://www.concept2.com/indoor-rowers/training/tips-and-general-info/damper-setting-101). Please note: even [Olympic rowers evade rowing at high drag factors as it is injury prone](https://www.concept2.com/news/damper-and-drag-olympians)
+The drag factor is how much drag the flywheel is generating, which for air rowers typically can be set using a lever at the flywheel. This is NOT a resistance lever, where you excel when it it at its highest. It is more like a gear on a bike, where [the choice for the optimal drag factor is an individual choice](https://www.concept2.com/indoor-rowers/training/tips-and-general-info/damper-setting-101). Please note: even [Olympic rowers evade rowing at high drag factors as it is injury prone](https://www.concept2.com/news/damper-and-drag-olympians)
 
 ## Drive length
 
