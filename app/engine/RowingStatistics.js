@@ -64,16 +64,15 @@ function createRowingStatistics (config, session) {
 
     // This is the core of the finite state machine that defines all state transitions
     switch (true) {
-      case (sessionStatus === 'Paused' && rower.strokeState() === 'Drive'):
-        // the order these are done in matters
-        resumeTraining()
+      case (sessionStatus === 'WaitingForStart' && rower.strokeState() === 'Drive'):
         sessionStatus = 'Rowing'
+        startTraining()
         updateContinousMetrics()
         emitMetrics('recoveryFinished')
         break
-      case (sessionStatus !== 'Rowing' && rower.strokeState() === 'Drive'):
+      case (sessionStatus === 'Paused' && rower.strokeState() === 'Drive'):
         sessionStatus = 'Rowing'
-        startTraining()
+        resumeTraining()
         updateContinousMetrics()
         emitMetrics('recoveryFinished')
         break
@@ -135,6 +134,10 @@ function createRowingStatistics (config, session) {
   }
 
   function resumeTraining () {
+    rower.allowMovement()
+  }
+
+  function allowResumeTraining () {
     rower.allowMovement()
     sessionStatus = 'WaitingForStart'
   }
@@ -341,7 +344,7 @@ function createRowingStatistics (config, session) {
     handleHeartrateMeasurement,
     handleRotationImpulse,
     stop: stopTraining,
-    resume: resumeTraining,
+    resume: allowResumeTraining,
     reset: resetTraining
   })
 }
