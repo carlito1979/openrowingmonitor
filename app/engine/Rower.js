@@ -313,7 +313,8 @@ function createRower (rowerSettings) {
 
   function reset () {
     _strokeState = 'WaitingForDrive'
-    flywheel.maintainStateOnly()
+    // flywheel.maintainStateOnly()
+    flywheel.reset() // it seems likely that this should be used instead of maintainStateOnly
     _totalNumberOfStrokes = -1.0
     drivePhaseStartTime = 0.0
     drivePhaseStartAngularPosition = 0.0

@@ -333,7 +333,8 @@ function createFlywheel (rowerSettings) {
     dragFactor,
     isDwelling,
     isUnpowered,
-    isPowered
+    isPowered,
+    reset // added to ensure timer is reset when user pushes reset button on web client
   }
 }
 
