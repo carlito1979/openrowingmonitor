@@ -293,6 +293,10 @@ function createWorkoutRecorder () {
   function minimumRecordingTimeHasPassed () {
     const minimumRecordingTimeInSeconds = 10
     const rotationImpulseTimeTotal = rotationImpulses.reduce((acc, impulse) => acc + impulse, 0)
+    // adding in fix for when the totalMovingTime check was failing and crashing out, because no strokes had been recorded
+    if (strokes.length == 0) {
+      return false
+    }
     const strokeTimeTotal = strokes[strokes.length - 1].totalMovingTime
     return (Math.max(rotationImpulseTimeTotal, strokeTimeTotal) > minimumRecordingTimeInSeconds)
   }

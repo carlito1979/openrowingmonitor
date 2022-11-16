@@ -98,7 +98,6 @@ export default {
     // PLEASE NOTE: Increasing this number decreases your rowed meters
     magicConstant: 2.8
   },
-
   // Concept2 RowErg
   Concept2_RowErg: {
     numOfImpulsesPerRevolution: 6,
@@ -156,5 +155,28 @@ export default {
     minumumForceBeforeStroke: 80,
     minimumDriveTime: 0.30,
     minimumRecoveryTime: 0.90
+  },
+
+  // Force USA R3 Air Rower
+  ForceUSA_R3: {
+    numOfImpulsesPerRevolution: 6,
+    minimumTimeBetweenImpulses: 0.005,
+    maximumTimeBetweenImpulses: 0.022,
+    flywheelInertia: 0.1015,
+    flankLength: 10,
+    dragFactor: 135,
+    autoAdjustDragFactor: true,
+    // new engine settings
+    sprocketRadius: 1.5,
+    minimumStrokeQuality: 0.50,
+    minumumRecoverySlope: 0.00070,
+    autoAdjustRecoverySlope: true,
+    autoAdjustRecoverySlopeMargin: 0.035,
+    minumumForceBeforeStroke: 20,
+    minimumDriveTime: 0.46,
+    minimumRecoveryTime: 0.80,
+    minimumDragQuality: 0.83,
+    dragFactorSmoothing: 3,
+    maximumStrokeTimeBeforePause: 4
   }
 }

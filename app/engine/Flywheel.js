@@ -218,7 +218,7 @@ function createFlywheel (rowerSettings) {
   }
 
   function isDwelling () {
-    // Check if the flywheel is spinning down beyond a recovry phase indicating that the rower has stopped rowing
+    // Check if the flywheel is spinning down beyond a recovery phase indicating that the rower has stopped rowing
     // We conclude this based on all CurrentDt's in the flank are above the maximum, indicating a spinning down flywheel
     if (deltaTimeSlopeAbove(0) && deltaTimesAbove(rowerSettings.maximumTimeBetweenImpulses)) {
       return true

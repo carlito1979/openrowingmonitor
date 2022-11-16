@@ -65,8 +65,9 @@ function createRowingStatistics (config, session) {
     // This is the core of the finite state machine that defines all state transitions
     switch (true) {
       case (sessionStatus === 'Paused' && rower.strokeState() === 'Drive'):
-        sessionStatus = 'Rowing'
+        // the order these are done in matters
         resumeTraining()
+        sessionStatus = 'Rowing'
         updateContinousMetrics()
         emitMetrics('recoveryFinished')
         break
