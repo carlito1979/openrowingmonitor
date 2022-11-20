@@ -58,6 +58,7 @@ export class PerformanceDashboard extends AppElement {
       <dashboard-metric .icon=${icon_stopwatch} unit="/500m" .value=${metrics?.cyclePaceFormatted?.value}></dashboard-metric>
       <dashboard-metric .icon=${icon_bolt} unit="watt" .value=${metrics?.cyclePower?.value}></dashboard-metric>
       <dashboard-metric .icon=${icon_paddle} unit="/min" .value=${metrics?.cycleStrokeRate?.value}></dashboard-metric>
+      <dashboard-metric .icon=${icon_paddle} unit="total" .value=${metrics?.totalNumberOfStrokes?.value}></dashboard-metric>
       ${metrics?.heartrate?.value
         ? html`
           <dashboard-metric .icon=${icon_heartbeat} unit="bpm" .value=${metrics?.heartrate?.value}>
@@ -68,8 +69,7 @@ export class PerformanceDashboard extends AppElement {
               : ''
             }
           </dashboard-metric>`
-        : html`<dashboard-metric .icon=${icon_paddle} unit="total" .value=${metrics?.totalNumberOfStrokes?.value}></dashboard-metric>`}
-      <dashboard-metric .icon=${icon_fire} unit="kcal" .value=${metrics?.totalCalories?.value}></dashboard-metric>
+        : html`<dashboard-metric .icon=${icon_fire} unit="kcal" .value=${metrics?.totalCalories?.value}></dashboard-metric>`}
       <dashboard-metric .icon=${icon_clock} .value=${metrics?.totalMovingTimeFormatted?.value}></dashboard-metric>
       <dashboard-actions .appState=${this.appState}></dashboard-actions>
     `
