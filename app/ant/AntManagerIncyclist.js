@@ -13,8 +13,8 @@ import log from 'loglevel'
 import Ant from 'incyclist-ant-plus'
 import EventEmitter from 'node:events'
 
-const {HeartRateSensor} = require('incyclist-ant-plus');
-const {AntDevice} = require('incyclist-ant-plus/lib/bindings')
+import HeartRateSensor from 'incyclist-ant-plus'
+import AntDevice from 'incyclist-ant-plus/lib/bindings'
 
 
 
