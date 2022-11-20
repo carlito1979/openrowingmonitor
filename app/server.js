@@ -14,7 +14,7 @@ import config from './tools/ConfigManager.js'
 import { createRowingStatistics } from './engine/RowingStatistics.js'
 import { createWebServer } from './WebServer.js'
 import { createPeripheralManager } from './ble/PeripheralManager.js'
-import { createAntManager } from './ant/AntManager.js'
+import { createAntManager } from './ant/AntManagerIncyclist.js'
 // eslint-disable-next-line no-unused-vars
 import { replayRowingSession } from './tools/RowingRecorder.js'
 import { createWorkoutRecorder } from './engine/WorkoutRecorder.js'
