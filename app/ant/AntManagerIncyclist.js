@@ -13,18 +13,13 @@ import log from 'loglevel'
 import Ant from 'incyclist-ant-plus'
 import EventEmitter from 'node:events'
 
-import HeartRateSensor from 'incyclist-ant-plus'
-import AntDevice from 'incyclist-ant-plus/lib/bindings'
-
-
-
 
 function createAntManager () {
   const emitter = new EventEmitter()
-  const antStick = new AntDevice({startupTimeout:2000 /*,debug:true, logger:console*/})
+  const antStick = new Ant.AntDevice({startupTimeout:2000 /*,debug:true, logger:console*/})
   // it seems that we have to use two separate heart rate sensors to support both old and new
   // ant sticks, since the library requires them to be bound before open is called
-  const heartrateSensor = new HeartRateSensor()
+  const heartrateSensor = new Ant.HeartRateSensor()
 
   heartrateSensor.on('hbData', (data) => {
     emitter.emit('heartrateMeasurement', { heartrate: data.ComputedHeartRate, batteryLevel: data.BatteryLevel })
