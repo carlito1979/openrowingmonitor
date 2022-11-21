@@ -179,7 +179,7 @@ if (config.heartrateMonitorBLE) {
 
 if (config.heartrateMonitorANT) {
   const antManager = createAntManager()
-  antManager.onData('heartrateMeasurement', (heartrateMeasurement) => {
+  antManager.on('heartrateMeasurement', (heartrateMeasurement) => {
     rowingStatistics.handleHeartrateMeasurement(heartrateMeasurement)
   })
 }
