@@ -19,39 +19,45 @@ function createAntManager (deviceID=-1) {
   const ant = new AntDevice({startupTimeout:2000, debug:true, logger:console})
   const heartRateSensor = new Ant()
 
-  const opened =  ant.open()
-  if (!opened) {
-    log.info('could not open ant stick')
-    return;
-  }
+  async function main(deviceID) {
 
-  const channel =  ant.getChannel()
-  if (!channel) {
-    log.info('could not open channel')
-    return;
-  }
-
-  if (deviceID === -1) { //scanning for device
-    log.info('scanning for sensors')
-    const sensor = new Ant()
-    channel.on('data', onData)
-    channel.startScanner()
-    channel.attach(sensor)
-  }
-  else { //device ID known
-    log.info('connecting with id=${deviceID}')
-    const sensor = new Ant(deviceID)
-    channel.on('data', onData)
-    const started =  channel.startSensor(sensor)
-    if (!started) {
-      log.info('could not start sensor')
-      ant.close()
+    const opened =  await ant.open()
+    if (!opened) {
+      log.info('could not open ant stick')
+      return;
     }
+  
+    const channel =  await ant.getChannel()
+    if (!channel) {
+      log.info('could not open channel')
+      return;
+    }
+  
+    if (deviceID === -1) { //scanning for device
+      log.info('scanning for sensors')
+      const sensor = new Ant()
+      channel.on('data', onData)
+      channel.startScanner()
+      channel.attach(sensor)
+    }
+    else { //device ID known
+      log.info('connecting with id=${deviceID}')
+      const sensor = new Ant(deviceID)
+      channel.on('data', onData)
+      const started =  channel.startSensor(sensor)
+      if (!started) {
+        log.info('could not start sensor')
+        ant.close()
+      }
+    }
+
   }
 
-  function onData(profile, deviceID, (data) => {
+  function onData(profile, deviceID, data) {
     emitter.emit('heartrateMeasurement', { heartrate: data.ComputedHeartRate, batteryLevel: data.BatteryLevel })
-  })
+  }
+
+  main(deviceID)
 
   return Object.assign(emitter, {
   })
