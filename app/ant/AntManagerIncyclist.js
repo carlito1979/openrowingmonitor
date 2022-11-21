@@ -49,7 +49,7 @@ function createAntManager (deviceID=-1) {
     }
   }
 
-  function onData(profile, deviceID, data => {
+  function onData(profile, deviceID, (data) => {
     emitter.emit('heartrateMeasurement', { heartrate: data.ComputedHeartRate, batteryLevel: data.BatteryLevel })
   })
 
