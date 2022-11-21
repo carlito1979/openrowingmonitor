@@ -34,14 +34,14 @@ async function createAntManager (deviceID=-1) {
   if (deviceID === -1) { //scanning for device
     log.info('scanning for sensors')
     const sensor = new Ant()
-    channel.on('data', onData)
+    channel.on('data', on)
     channel.startScanner()
     channel.attach(sensor)
   }
   else { //device ID known
     log.info('connecting with id=${deviceID}')
     const sensor = new Ant(deviceID)
-    channel.on('data', onData)
+    channel.on('data', on)
     const started = await channel.startSensor(sensor)
     if (!started) {
       log.info('could not start sensor')
@@ -49,7 +49,7 @@ async function createAntManager (deviceID=-1) {
     }
   }
 
-  function onData(profile, deviceID, data) {
+  function on(profile, deviceID, data) {
     emitter.emit('heartrateMeasurement', { heartrate: data.ComputedHeartRate, batteryLevel: data.BatteryLevel })
   }
 
