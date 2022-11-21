@@ -14,11 +14,58 @@ import Ant from 'incyclist-ant-plus'
 import AntDevice from 'incyclist-ant-plus/lib/bindings/index.js'
 import EventEmitter from 'node:events'
 
-function createAntManager () {
+async function createAntManager (deviceID=-1) {
   const emitter = new EventEmitter()
-  const antDevice = new AntDevice()
+  const ant = new AntDevice({startupTimeout:2000, debug:true, logger:console})
+  const heartRateSensor = new Ant()
 
-  const antStick = new antDevice()
+  const opened = await ant.open()
+  if (!opened) {
+    log.info('could not open ant stick')
+    return;
+  }
+
+  const channel = await ant.getChannel()
+  if (!channel) {
+    log.info('could not open channel')
+    return;
+  }
+
+  if (deviceID === -1) { //scanning for device
+    log.info('scanning for sensors')
+    const sensor = new Ant()
+    channel.on('data', onData)
+    channel.startScanner()
+    channel.attach(sensor)
+  }
+  else { //device ID known
+    log.info('connecting with id=${deviceID}')
+    const sensor = new Ant(deviceID)
+    channel.on('data', onData)
+    const started = await channel.startSensor(sensor)
+    if (!started) {
+      log.info('could not start sensor')
+      ant.close()
+    }
+  }
+
+  function onData(profile, deviceID, data) {
+    emitter.emit('heartrateMeasurement', { heartrate: data.ComputedHeartRate, batteryLevel: data.BatteryLevel })
+  }
+
+  return Object.assign(emitter, {
+  })
+}
+/*
+
+
+
+
+
+
+
+
+  //const antStick = new antDevice()
   // it seems that we have to use two separate heart rate sensors to support both old and new
   // ant sticks, since the library requires them to be bound before open is called
   const heartrateSensor = new Ant.HeartRateSensor(antStick)
@@ -40,8 +87,7 @@ function createAntManager () {
     log.debug('classic ANT+ stick NOT found')
   }
 
-  return Object.assign(emitter, {
-  })
 }
+*/
 
 export { createAntManager }
