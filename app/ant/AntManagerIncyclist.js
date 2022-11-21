@@ -11,7 +11,7 @@
 */
 import log from 'loglevel'
 import Ant from 'incyclist-ant-plus'
-import AntDevice from 'incyclist-ant-plus/lib/bindings'
+import AntDevice from 'incyclist-ant-plus/lib/bindings/index.js'
 import EventEmitter from 'node:events'
 
 function createAntManager () {
