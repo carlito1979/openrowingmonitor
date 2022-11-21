@@ -11,11 +11,12 @@
 */
 import log from 'loglevel'
 import Ant from 'incyclist-ant-plus'
+import AntDevice from 'incyclist-ant-plus/lib/bindings'
 import EventEmitter from 'node:events'
 
 function createAntManager () {
   const emitter = new EventEmitter()
-  const antDevice = new Ant.AntDevice()
+  const antDevice = new AntDevice()
 
   const antStick = new antDevice()
   // it seems that we have to use two separate heart rate sensors to support both old and new
