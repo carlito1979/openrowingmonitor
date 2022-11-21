@@ -14,18 +14,18 @@ import Ant from 'incyclist-ant-plus'
 import AntDevice from 'incyclist-ant-plus/lib/bindings/index.js'
 import EventEmitter from 'node:events'
 
-async function createAntManager (deviceID=-1) {
+function createAntManager (deviceID=-1) {
   const emitter = new EventEmitter()
   const ant = new AntDevice({startupTimeout:2000, debug:true, logger:console})
   const heartRateSensor = new Ant()
 
-  const opened = await ant.open()
+  const opened =  ant.open()
   if (!opened) {
     log.info('could not open ant stick')
     return;
   }
 
-  const channel = await ant.getChannel()
+  const channel =  ant.getChannel()
   if (!channel) {
     log.info('could not open channel')
     return;
@@ -42,14 +42,14 @@ async function createAntManager (deviceID=-1) {
     log.info('connecting with id=${deviceID}')
     const sensor = new Ant(deviceID)
     channel.on('data', onData)
-    const started = await channel.startSensor(sensor)
+    const started =  channel.startSensor(sensor)
     if (!started) {
       log.info('could not start sensor')
       ant.close()
     }
   }
 
-  function onData(profile, deviceID, (data) => {
+  function onData(profile, deviceID, data => {
     emitter.emit('heartrateMeasurement', { heartrate: data.ComputedHeartRate, batteryLevel: data.BatteryLevel })
   })
 
