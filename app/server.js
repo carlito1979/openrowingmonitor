@@ -15,6 +15,7 @@ import { createRowingStatistics } from './engine/RowingStatistics.js'
 import { createWebServer } from './WebServer.js'
 import { createPeripheralManager } from './ble/PeripheralManager.js'
 import { createAntManager } from './ant/AntManager2.js'
+import { createAntServer } from './ant/AntServer.js'
 // eslint-disable-next-line no-unused-vars
 import { replayRowingSession } from './tools/RowingRecorder.js'
 import { createWorkoutRecorder } from './engine/WorkoutRecorder.js'
@@ -55,6 +56,7 @@ const session = {
 log.info(`Session settings: distance limit: ${(session.targetDistance > 0 ? `${session.targetDistance} meters` : 'none')}, time limit: ${(session.targetTime > 0 ? `${session.targetTime} seconds` : 'none')}\n`)
 
 const peripheralManager = createPeripheralManager()
+const antServer = createAntServer()
 
 peripheralManager.on('control', (event) => {
   switch (event?.req?.name) {
@@ -110,6 +112,7 @@ function resetWorkout () {
   workoutRecorder.reset()
   rowingStatistics.reset()
   peripheralManager.notifyStatus({ name: 'reset' })
+  antServer.notifyStatus({ name: 'reset' })
 }
 
 const gpioTimerService = child_process.fork('./app/gpio/GpioTimerService.js')
@@ -127,12 +130,14 @@ const workoutUploader = createWorkoutUploader(workoutRecorder)
 rowingStatistics.on('driveFinished', (metrics) => {
   webServer.notifyClients('metrics', metrics)
   peripheralManager.notifyMetrics('strokeStateChanged', metrics)
+  antServer.notifyMetrics('strokeStateChanged', metrics)
 })
 
 rowingStatistics.on('recoveryFinished', (metrics) => {
   logMetrics(metrics)
   webServer.notifyClients('metrics', metrics)
   peripheralManager.notifyMetrics('strokeFinished', metrics)
+  antServer.notifyMetrics('strokeFinished', metrics)
   workoutRecorder.recordStroke(metrics)
 })
 
@@ -142,6 +147,7 @@ rowingStatistics.on('webMetricsUpdate', (metrics) => {
 
 rowingStatistics.on('peripheralMetricsUpdate', (metrics) => {
   peripheralManager.notifyMetrics('metricsUpdate', metrics)
+  antServer.notifyMetrics('metricsUpdate', metrics)
 })
 
 rowingStatistics.on('rowingPaused', (metrics) => {
@@ -150,6 +156,7 @@ rowingStatistics.on('rowingPaused', (metrics) => {
   workoutRecorder.handlePause()
   webServer.notifyClients('metrics', metrics)
   peripheralManager.notifyMetrics('metricsUpdate', metrics)
+  antServer.notifyMetrics('metricsUpdate', metrics)
 })
 
 rowingStatistics.on('intervalTargetReached', (metrics) => {
@@ -167,6 +174,7 @@ rowingStatistics.on('rowingStopped', (metrics) => {
   workoutRecorder.recordStroke(metrics)
   webServer.notifyClients('metrics', metrics)
   peripheralManager.notifyMetrics('metricsUpdate', metrics)
+  antServer.notifyMetrics('metricsUpdate', metrics)
   workoutRecorder.writeRecordings(metrics)
 })
 
