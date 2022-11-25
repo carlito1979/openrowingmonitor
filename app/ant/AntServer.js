@@ -11,7 +11,7 @@
 */
 import log from 'loglevel'
 import Ant from 'gd-ant-plus'
-import {Timer} from './timer'
+import {Timer} from './timer.js'
 
 const DEVICE_TYPE = 0x11; // Ant FE-C device
 const DEVICE_NUMBER = 1;
