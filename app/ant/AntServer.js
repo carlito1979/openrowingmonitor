@@ -19,15 +19,15 @@ const PERIOD = 8192; // 8192/32768 ~4hz
 const RF_CHANNEL = 57; // 2457 MHz
 const BROADCAST_INTERVAL = PERIOD / 32768; // seconds
 // this defines the series order that we broadcast the pages in order to meet Ant+ Spec requirements
-//const PAGE_INTERLEAVING = [16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,80,80,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,81,81]
-const PAGE_INTERLEAVING = [16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,80,80,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,81,81]
-const ASLEEP_STATE = 0b00010000
-const READY_STATE = 0b00100000
-const IN_USE_STATE = 0b00110000
-const FINISHED_STATE = 0b01010000
-const FLIP_LAP = 0b10000000 // used to flip the lap bit (future enhancement)
-const PAGE_16_FLAGS = 0b0100 // Flags for some of the information being sent to Watch - No Heart Rate Sent, Distance Sent, Speed is Real
-const PAGE_22_FLAGS =0b0001 // Flags for some of the informaiton being sent to Watch - Indicates that rowing machine is sending stroke count to watch
+const PAGE_INTERLEAVING = [16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,80,80,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,81,81]
+//const PAGE_INTERLEAVING = [16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,80,80,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,81,81]
+const ASLEEP_STATE =    0b0010000
+const READY_STATE =     0b0100000
+const IN_USE_STATE =    0b0110000
+const FINISHED_STATE =  0b1010000
+const FLIP_LAP =       0b10000000 // used to flip the lap bit (future enhancement)
+const PAGE_16_FLAGS =      0b0100 // Flags for some of the information being sent to Watch - No Heart Rate Sent, Distance Sent, Speed is Real
+const PAGE_22_FLAGS =      0b0001 // Flags for some of the informaiton being sent to Watch - Indicates that rowing machine is sending stroke count to watch
 
 
 const defaults = {
@@ -56,9 +56,6 @@ export class AntServer {
     
     this.eventCount = 0;
     this.accumulatedPower = 0;
-    
-    this.power = 0;
-    this.cadence = 0;
 
     this.sessionStatus = 'WaitingForStart'
     this.totalMovingTime = 0
@@ -170,17 +167,18 @@ export class AntServer {
     Capabilities/FE State
    */
   notifyMetrics(type, metrics) {
-    
+
     this.sessionStatus = metrics.sessionStatus
     this.totalMovingTime = metrics.totalMovingTime // in seconds, total session time
     this.totalNumberOfStrokes = metrics.totalNumberOfStrokes // in integers, total number of strokes in session
     this.totalLinearDistance = metrics.totalLinearDistance // in meters
     this.cycleStrokeRate = metrics.cycleStrokeRate
-    this.cycleLinearVelocity = metrics.cycleLinearVelocity // in m/s
-    this.cyclePower = metrics.cyclePower // we could use instantPower instead?
+    this.cycleLinearVelocity = Math.round(metrics.cycleLinearVelocity *1000) // each unit = 0.001 m/s
+    this.cyclePower = Math.round(metrics.cyclePower) // we could use instantPower instead?
     this.dragFactor = Math.round(metrics.dragFactor -50) // drag factor as a raw resistance value (each unit = 0.5%)
-    this.driveLength = metrics.driveLength // used for stroke length. May be the wrong metric?
+    this.driveLength = Math.round(metrics.driveLength * 100) // used for stroke length. May be the wrong metric? (each unit = 0.01 m)
     // update sessionState and capabilities state
+    // we might want to use this to "flip" the lap switch whenever the rower moves from paused or waitingforstart to rowing?
     switch (this.sessionStatus) {
       case 'Rowing':
         this.capabilitiesState = IN_USE_STATE
@@ -207,9 +205,6 @@ export class AntServer {
   notifyStatus(type) {
     this.eventCount = 0;
     this.accumulatedPower = 0;
-    
-    this.power = 0;
-    this.cadence = 0;
 
     this.sessionStatus = 'WaitingForStart'
     this.totalMovingTime = 0
@@ -252,13 +247,12 @@ export class AntServer {
           0x16, // Rowing Machine (22)
           ...Ant.Messages.intToLEHexArray(this.accumulatedTime, 1), // elapsed time
           ...Ant.Messages.intToLEHexArray(this.accumulatedDistance, 1), // distance travelled
-          ...Ant.Messages.intToLEHexArray(Math.round(this.cycleLinearVelocity *1000), 2), // speed in m/s *1000
+          ...Ant.Messages.intToLEHexArray(this.cycleLinearVelocity, 2), // speed in 0.001 m/s
           0xFF, // heart rate not being sent
           ...Ant.Messages.intToLEHexArray((this.capabilitiesState +PAGE_16_FLAGS), 1)
         ]
         if (this.sessionStatus === 'Rowing') {
-          log.debug(`Page 16 Data Sent. Event=${this.eventCount}. Time=${this.accumulatedTime}. Distance=${this.accumulatedDistance}. Speed=${Math.round(this.cycleLinearVelocity *1000)}.`)
-          hexString = Ant.Messages.intToLEHexArray(Math.round(this.cycleLinearVelocity *1000), 2)
+          log.debug(`Page 16 Data Sent. Event=${this.eventCount}. Time=${this.accumulatedTime}. Distance=${this.accumulatedDistance}. Speed=${this.cycleLinearVelocity}.`)
           log.debug(`Hex Time=0x${this.accumulatedTime.toString(16)}. Hex Distance=0x${this.accumulatedDistance.toString(16)}. Hex Speed=0x${hexString}.`)
         }
         break
@@ -268,14 +262,14 @@ export class AntServer {
           0x11, // Page 17
           0xFF, // Reserved
           0xFF, // Reserved
-          ...Ant.Messages.intToLEHexArray(Math.round(this.driveLength * 100), 1), // Stroke Length
+          ...Ant.Messages.intToLEHexArray(this.driveLength, 1), // Stroke Length in 0.01 m
           0x7FFF, // Incline (Not Used)
           ...Ant.Messages.intToLEHexArray(this.dragFactor, 1),// Drag Factor Interpreted as Resistance. DF 50 = 0%, DF 250 = 100% (e.g., DF 130 = 40% resistance) each unit = 0.5%
           ...Ant.Messages.intToLEHexArray(this.capabilitiesState, 1)
         ]
         if (this.sessionStatus === 'Rowing') {
-          log.debug(`Page 17 Data Sent. Event=${this.eventCount}. Stroke Length=${Math.round(this.driveLength * 100)}. Drag Factor=${this.dragFactor}.`)
-          log.debug(`Hex Stroke Length=0x${Math.round(this.driveLength * 100).toString(16)}. Hex Drag Factor=0x${this.dragFactor.toString(16)}.`)
+          log.debug(`Page 17 Data Sent. Event=${this.eventCount}. Stroke Length=${this.driveLength}. Drag Factor=${this.dragFactor}.`)
+          log.debug(`Hex Stroke Length=0x${this.driveLength.toString(16)}. Hex Drag Factor=0x${this.dragFactor.toString(16)}.`)
         }
         break
       case 22: // 0x16 - Specific Rower Data (once a second)
