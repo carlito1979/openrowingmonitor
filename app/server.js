@@ -216,7 +216,7 @@ function startAnt() {
     log.info('No ANT+ stick was found')
     return
   }
-  if (!this.antStick.open()) {
+  if (!antStick.open()) {
     log.error('Failed to open ANT+ stick');
   }
 }
