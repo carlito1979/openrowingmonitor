@@ -284,13 +284,13 @@ export class AntServer {
           0xFF, // Reserved
           0xFF, // Reserved
           ...Ant.Messages.intToLEHexArray(this.accumulatedStrokes, 1), // Stroke Count
-          ...Ant.Messages.intToLEHexArray(this.cycleStrokeRate, 1), // Cadence / Stroke Rate
-          ...Ant.Messages.intToLEHexArray(this.cyclePower *100, 2), // Instant Power (2 bytes) (Documentation is misleading? Looks like number needs to be multiplied by a factor of 100)
+          ...Ant.Messages.intToLEHexArray(Math.round(this.cycleStrokeRate), 1), // Cadence / Stroke Rate
+          ...Ant.Messages.intToLEHexArray(Math.round(this.cyclePower *100), 2), // Instant Power (2 bytes) (Documentation is misleading? Looks like number needs to be multiplied by a factor of 100)
           ...Ant.Messages.intToLEHexArray((this.capabilitiesState +PAGE_22_FLAGS), 1)
         ]
         if (this.sessionStatus === 'Rowing') {
-          log.debug(`Page 22 Data Sent. Event=${this.eventCount}. Strokes=${this.accumulatedStrokes}. Stroke Rate=${this.cycleStrokeRate}. Power=${this.cyclePower *100}`)
-          hexString = Ant.Messages.intToLEHexArray(this.cyclePower *100, 2)
+          log.debug(`Page 22 Data Sent. Event=${this.eventCount}. Strokes=${this.accumulatedStrokes}. Stroke Rate=${Math.round(this.cycleStrokeRate)}. Power=${Math.round(this.cyclePower *100)}`)
+          hexString = Ant.Messages.intToLEHexArray(Math.round(this.cyclePower *100), 2)
           log.debug(`Hex Strokes=0x${this.accumulatedStrokes.toString(16)}. Hex Stroke Rate=0x${this.cycleStrokeRate.toString(16)}. Hex Power=0x${hexString}`)
         }
         break
