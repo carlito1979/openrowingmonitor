@@ -9,11 +9,9 @@
   - Garmin USB or USB2 ANT+ or an off-brand clone of it (ID 0x1008)
   - Garmin mini ANT+ (ID 0x1009)
 */
-import loglevel from 'loglevel'
+import log from 'loglevel'
 import Ant from 'gd-ant-plus'
 import {Timer} from './timer.js'
-
-const log = loglevel.getLogger('default')
 
 const DEVICE_TYPE = 0x11; // Ant FE-C device
 const DEVICE_NUMBER = 1;
