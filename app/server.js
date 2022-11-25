@@ -212,9 +212,12 @@ function onAntStickStartup() {
 }
 
 function startAnt() {
-  if (!onAntStickStartup.is_present()) {
+  if (!antStick.is_present()) {
     log.info('No ANT+ stick was found')
     return
+  }
+  if (!this.antStick.open()) {
+    log.error('Failed to open ANT+ stick');
   }
 }
 
