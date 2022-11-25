@@ -20,10 +20,13 @@ const RF_CHANNEL = 57; // 2457 MHz
 const BROADCAST_INTERVAL = PERIOD / 32768; // seconds
 // this defines the series order that we broadcast the pages in order to meet Ant+ Spec requirements
 const PAGE_INTERLEAVING = [16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,80,80,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,81,81]
-const READY_STATE = 36
-const IN_USE_STATE = 52
-const FINISHED_STATE = 84
-const FLIP_LAP = 128 // used to flip the lap bit (future enhancement)
+const ASLEEP_STATE = 0b00010000
+const READY_STATE = 0b00100000
+const IN_USE_STATE = 0b00110000
+const FINISHED_STATE = 0b01010000
+const FLIP_LAP = 0b10000000 // used to flip the lap bit (future enhancement)
+const PAGE_16_FLAGS = 0b0100 // Flags for some of the information being sent to Watch - No Heart Rate Sent, Distance Sent, Speed is Real
+const PAGE_22_FLAGS =0b0001 // Flags for some of the informaiton being sent to Watch - Indicates that rowing machine is sending stroke count to watch
 
 
 const defaults = {
@@ -218,7 +221,7 @@ export class AntServer {
     this.cycleLinearVelocity = 0
     this.cyclePower = 0
     this.dragFactor = 0
-    this.capabilitiesState = READY_STATE // 36 = ready, 52 = in use, 84 = finished
+    this.capabilitiesState = READY_STATE 
     this.driveLength = 0
     // we may one day use this to turn off broadcasting or stopping the machine?
   }
@@ -238,6 +241,7 @@ export class AntServer {
     this.accumulatedTime = Math.trunc(this.totalMovingTime * 4) // each second = 4 units for elapsed time in Ant+
     this.accumulatedTime &= 0xFF
     var data = []
+    var hexString = ''
     // determine which data page to write
     switch (PAGE_INTERLEAVING[this.eventCount]) {
       case 16: // 0x10 - General FE Data (twice a second)
@@ -249,10 +253,10 @@ export class AntServer {
           ...Ant.Messages.intToLEHexArray(this.accumulatedDistance, 1), // distance travelled
           ...Ant.Messages.intToLEHexArray(Math.round(this.cycleLinearVelocity *1000), 2), // speed in m/s *1000
           0xFF, // heart rate not being sent
-          ...Ant.Messages.intToLEHexArray(this.capabilitiesState, 1)
+          ...Ant.Messages.intToLEHexArray((this.capabilitiesState +PAGE_16_FLAGS), 1)
         ]
         if (this.sessionStatus === 'Rowing') {
-          log.debug(`Page 16 Data Sent. Event=${this.eventCount}. Time=${this.accumulatedTime}. Distance=${this.accumulatedDistance}. Speed=${Math.round(this.totalLincycleLinearVelocityearDistance *1000)}.`)
+          log.debug(`Page 16 Data Sent. Event=${this.eventCount}. Time=${this.accumulatedTime}. Distance=${this.accumulatedDistance}. Speed=${Math.round(this.cycleLinearVelocity *1000)}.`)
           log.debug(`Hex Time=0x${this.accumulatedTime.toString(16)}. Hex Distance=0x${this.accumulatedDistance.toString(16)}. Hex Speed=0x${Math.round(this.cycleLinearVelocity *1000).toString(16)}.`)
         }
         break
@@ -281,11 +285,12 @@ export class AntServer {
           ...Ant.Messages.intToLEHexArray(this.accumulatedStrokes, 1), // Stroke Count
           ...Ant.Messages.intToLEHexArray(this.cycleStrokeRate, 1), // Cadence / Stroke Rate
           ...Ant.Messages.intToLEHexArray(this.cyclePower, 2), // Instant Power (2 bytes)
-          ...Ant.Messages.intToLEHexArray(this.capabilitiesState, 1)
+          ...Ant.Messages.intToLEHexArray((this.capabilitiesState +PAGE_22_FLAGS), 1)
         ]
         if (this.sessionStatus === 'Rowing') {
           log.debug(`Page 22 Data Sent. Event=${this.eventCount}. Strokes=${this.accumulatedStrokes}. Stroke Rate=${this.cycleStrokeRate}. Power=${this.cyclePower}`)
-          log.debug(`Hex Strokes=0x${this.accumulatedStrokes.toString(16)}. Hex Stroke Rate=0x${this.cycleStrokeRate.toString(16)}. Hex Power=0x${Ant.Messages.intToLEHexArray(this.cyclePower, 2)}`)
+          hexString = Ant.Messages.intToLEHexArray(this.cyclePower, 2)
+          log.debug(`Hex Strokes=0x${this.accumulatedStrokes.toString(16)}. Hex Stroke Rate=0x${this.cycleStrokeRate.toString(16)}. Hex Power=0x${hexString}`)
         }
         break
       case 80: // 0x50 - Common Page for Manufacturers Identification (approx twice a minute)
@@ -321,6 +326,7 @@ export class AntServer {
       this.eventCount = 0
     }
   }
+
 }
 
 
