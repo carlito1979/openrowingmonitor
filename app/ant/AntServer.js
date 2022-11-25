@@ -284,7 +284,7 @@ export class AntServer {
           0xFF, // Reserved
           ...Ant.Messages.intToLEHexArray(this.accumulatedStrokes, 1), // Stroke Count
           ...Ant.Messages.intToLEHexArray(this.cycleStrokeRate, 1), // Cadence / Stroke Rate
-          ...Ant.Messages.intToLEHexArray(this.cyclePower, 2), // Instant Power (2 bytes)
+          ...Ant.Messages.intToLEHexArray(this.cyclePower *100, 2), // Instant Power (2 bytes) (Documentation is misleading? Looks like number needs to be multiplied by a factor of 100)
           ...Ant.Messages.intToLEHexArray((this.capabilitiesState +PAGE_22_FLAGS), 1)
         ]
         if (this.sessionStatus === 'Rowing') {
