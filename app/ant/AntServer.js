@@ -170,9 +170,9 @@ export class AntServer {
     this.sessionStatus = metrics.sessionStatus
     this.totalMovingTime = metrics.totalMovingTime // in seconds, total session time
     this.totalNumberOfStrokes = metrics.totalNumberOfStrokes // in integers, total number of strokes in session
-    this.totalLinearDistance = metrics.totalLinearDistance // in m/s
+    this.totalLinearDistance = metrics.totalLinearDistance // in meters
     this.cycleStrokeRate = metrics.cycleStrokeRate
-    this.cycleLinearVelocity = metrics.cycleLinearVelocity
+    this.cycleLinearVelocity = metrics.cycleLinearVelocity // in m/s
     this.cyclePower = metrics.cyclePower // we could use instantPower instead?
     this.dragFactor = Math.round(metrics.dragFactor -50) // drag factor as a raw resistance value (each unit = 0.5%)
     this.driveLength = metrics.driveLength // used for stroke length. May be the wrong metric?
@@ -198,6 +198,33 @@ export class AntServer {
   }
 
   /**
+   * The Server has reset metrics
+   */
+  notifyStatus(type) {
+    this.eventCount = 0;
+    this.accumulatedPower = 0;
+    
+    this.power = 0;
+    this.cadence = 0;
+
+    this.sessionStatus = 'WaitingForStart'
+    this.totalMovingTime = 0
+    this.accumulatedTime = 0
+    this.totalNumberOfStrokes = 0
+    this.accumulatedStrokes = 0
+    this.totalLinearDistance = 0
+    this.accumulatedDistance = 0
+    this.cycleStrokeRate = 0
+    this.cycleLinearVelocity = 0
+    this.cyclePower = 0
+    this.dragFactor = 0
+    this.capabilitiesState = READY_STATE // 36 = ready, 52 = in use, 84 = finished
+    this.driveLength = 0
+    // we may one day use this to turn off broadcasting or stopping the machine?
+  }
+
+
+  /**
    * Broadcast information over ANT+.
    * Broadcast Rate is 4Hz
    * 
@@ -220,13 +247,13 @@ export class AntServer {
           0x16, // Rowing Machine (22)
           ...Ant.Messages.intToLEHexArray(this.accumulatedTime, 1), // elapsed time
           ...Ant.Messages.intToLEHexArray(this.accumulatedDistance, 1), // distance travelled
-          ...Ant.Messages.intToLEHexArray(Math.round(this.totalLinearDistance *1000), 2), // speed in m/s *1000
+          ...Ant.Messages.intToLEHexArray(Math.round(this.cycleLinearVelocity *1000), 2), // speed in m/s *1000
           0xFF, // heart rate not being sent
           ...Ant.Messages.intToLEHexArray(this.capabilitiesState, 1)
         ]
         if (this.sessionStatus === 'Rowing') {
-          log.debug(`Page 16 Data Sent. Event=${this.eventCount}. Time=${this.accumulatedTime}. Distance=${this.accumulatedDistance}. Speed=${Math.round(this.totalLinearDistance *1000)}.`)
-          log.debug(`Hex Time=0x${this.accumulatedTime.toString(16)}. Hex Distance=0x${this.accumulatedDistance.toString(16)}. Hex Speed=0x${Math.round(this.totalLinearDistance *1000).toString(16)}.`)
+          log.debug(`Page 16 Data Sent. Event=${this.eventCount}. Time=${this.accumulatedTime}. Distance=${this.accumulatedDistance}. Speed=${Math.round(this.totalLincycleLinearVelocityearDistance *1000)}.`)
+          log.debug(`Hex Time=0x${this.accumulatedTime.toString(16)}. Hex Distance=0x${this.accumulatedDistance.toString(16)}. Hex Speed=0x${Math.round(this.cycleLinearVelocity *1000).toString(16)}.`)
         }
         break
       case 17: // 0x11 - General Settings Page (once a second)
@@ -258,7 +285,7 @@ export class AntServer {
         ]
         if (this.sessionStatus === 'Rowing') {
           log.debug(`Page 22 Data Sent. Event=${this.eventCount}. Strokes=${this.accumulatedStrokes}. Stroke Rate=${this.cycleStrokeRate}. Power=${this.cyclePower}`)
-          log.debug(`Hex Strokes=0x${this.accumulatedStrokes.toString(16)}. Hex Stroke Rate=0x${this.cycleStrokeRate.toString(16)}. Hex Power=0x${this.cyclePower.toString(16)}`)
+          log.debug(`Hex Strokes=0x${this.accumulatedStrokes.toString(16)}. Hex Stroke Rate=0x${this.cycleStrokeRate.toString(16)}. Hex Power=0x${Ant.Messages.intToLEHexArray(this.cyclePower, 2)}`)
         }
         break
       case 80: // 0x50 - Common Page for Manufacturers Identification (approx twice a minute)
