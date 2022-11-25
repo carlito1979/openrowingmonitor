@@ -19,7 +19,8 @@ const PERIOD = 8192; // 8192/32768 ~4hz
 const RF_CHANNEL = 57; // 2457 MHz
 const BROADCAST_INTERVAL = PERIOD / 32768; // seconds
 // this defines the series order that we broadcast the pages in order to meet Ant+ Spec requirements
-const PAGE_INTERLEAVING = [16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,80,80,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,81,81]
+//const PAGE_INTERLEAVING = [16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,80,80,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,81,81]
+const PAGE_INTERLEAVING = [16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,80,80,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,81,81]
 const ASLEEP_STATE = 0b00010000
 const READY_STATE = 0b00100000
 const IN_USE_STATE = 0b00110000
@@ -279,7 +280,7 @@ export class AntServer {
       case 22: // 0x16 - Specific Rower Data (once a second)
         data = [
           channel,
-          0x16, // Page 17
+          0x16, // Page 22
           0xFF, // Reserved
           0xFF, // Reserved
           ...Ant.Messages.intToLEHexArray(this.accumulatedStrokes, 1), // Stroke Count
@@ -288,8 +289,8 @@ export class AntServer {
           ...Ant.Messages.intToLEHexArray((this.capabilitiesState +PAGE_22_FLAGS), 1)
         ]
         if (this.sessionStatus === 'Rowing') {
-          log.debug(`Page 22 Data Sent. Event=${this.eventCount}. Strokes=${this.accumulatedStrokes}. Stroke Rate=${this.cycleStrokeRate}. Power=${this.cyclePower}`)
-          hexString = Ant.Messages.intToLEHexArray(this.cyclePower, 2)
+          log.debug(`Page 22 Data Sent. Event=${this.eventCount}. Strokes=${this.accumulatedStrokes}. Stroke Rate=${this.cycleStrokeRate}. Power=${this.cyclePower *100}`)
+          hexString = Ant.Messages.intToLEHexArray(this.cyclePower *100, 2)
           log.debug(`Hex Strokes=0x${this.accumulatedStrokes.toString(16)}. Hex Stroke Rate=0x${this.cycleStrokeRate.toString(16)}. Hex Power=0x${hexString}`)
         }
         break
