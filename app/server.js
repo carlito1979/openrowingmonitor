@@ -15,7 +15,8 @@ import { createRowingStatistics } from './engine/RowingStatistics.js'
 import { createWebServer } from './WebServer.js'
 import { createPeripheralManager } from './ble/PeripheralManager.js'
 import { createAntManager } from './ant/AntManager2.js'
-import { createAntServer } from './ant/AntServer.js'
+import { createAntStick } from './ant/AntStick.js'
+import { AntServer } from './ant/AntServer.js'
 // eslint-disable-next-line no-unused-vars
 import { replayRowingSession } from './tools/RowingRecorder.js'
 import { createWorkoutRecorder } from './engine/WorkoutRecorder.js'
@@ -56,7 +57,6 @@ const session = {
 log.info(`Session settings: distance limit: ${(session.targetDistance > 0 ? `${session.targetDistance} meters` : 'none')}, time limit: ${(session.targetTime > 0 ? `${session.targetTime} seconds` : 'none')}\n`)
 
 const peripheralManager = createPeripheralManager()
-const antServer = createAntServer()
 
 peripheralManager.on('control', (event) => {
   switch (event?.req?.name) {
@@ -186,11 +186,43 @@ if (config.heartrateMonitorBLE) {
 }
 
 if (config.heartrateMonitorANT) {
+/* old code 
   const antManager = createAntManager()
   antManager.on('heartrateMeasurement', (heartrateMeasurement) => {
     rowingStatistics.handleHeartrateMeasurement(heartrateMeasurement)
   })
+*/
 }
+
+// create the antStick server
+const antStick = createAntStick()
+const antServer = new AntServer(antStick)
+antStick.on('startup', () => {
+  onAntStickStartup()
+})
+try {
+  startAnt()
+} catch (error) {
+  log.error('Something went wrong with ANT Server', error)
+}
+
+function onAntStickStartup() {
+  log.info('ANT+ stick opened')
+  antServer.start()
+}
+
+function startAnt() {
+  if (!onAntStickStartup.is_present()) {
+    log.info('No ANT+ stick was found')
+    return
+  }
+}
+
+function stopAnt() {
+  log.info('Stopping ANT+ Server')
+  antServer.stop()
+}
+
 
 workoutUploader.on('authorizeStrava', (data, client) => {
   webServer.notifyClient(client, 'authorizeStrava', data)
@@ -267,3 +299,4 @@ replayRowingSession(handleRotationImpulse, {
   loop: false
 })
 */
+
