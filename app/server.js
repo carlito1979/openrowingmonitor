@@ -213,6 +213,7 @@ try {
 }
 
 function toggleAntServer() {
+  console.log('toggleAntServer - funciton in server.js')
   if (antServer.isRunning) {
     antServer.stop()
   } else {
@@ -268,6 +269,7 @@ webServer.on('messageReceived', async (message, client) => {
       workoutUploader.stravaAuthorizationCode(message.data)
       break
     case 'toggleAntServer':
+      console.log('toggleAntServer - server.js')
       toggleAntServer()
       break
     default:

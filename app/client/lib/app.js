@@ -148,6 +148,7 @@ export function createApp (app) {
         break
       }
       case 'toggleAntServer': {
+        console.log('toggleAntServer - app.js')
         if (socket)socket.send(JSON.stringify({ command: 'toggleAntServer' }))
         break
       }

@@ -140,6 +140,7 @@ export class DashboardActions extends AppElement {
   }
 
   toggleAntServer () {
+    console.log('toggleAntServer - DashboardActions.js')
     this.sendEvent('tiggerAction', { command: 'toggleAntServer' })
   }
 
