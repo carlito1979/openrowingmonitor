@@ -268,7 +268,7 @@ webServer.on('messageReceived', async (message, client) => {
       workoutUploader.stravaAuthorizationCode(message.data)
       break
     case 'toggleAntServer':
-      toggleAnt()
+      toggleAntServer()
       break
     default:
       log.warn('invalid command received:', message)
@@ -284,7 +284,8 @@ function getConfig () {
   return {
     peripheralMode: peripheralManager.getPeripheralMode(),
     stravaUploadEnabled: !!config.stravaClientId && !!config.stravaClientSecret,
-    shutdownEnabled: !!config.shutdownCommand
+    shutdownEnabled: !!config.shutdownCommand,
+    antServerEnabled: !!config.antServerEnabled
   }
 }
 

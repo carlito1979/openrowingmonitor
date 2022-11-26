@@ -18,6 +18,6 @@ export const APP_STATE = {
     // true if remote device shutdown is enabled
     shutdownEnabled: false,
     // true if ant server is available
-    antServerEnabled: false
+    antServerEnabled: true
   }
 }

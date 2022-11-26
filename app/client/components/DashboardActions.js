@@ -103,13 +103,19 @@ export class DashboardActions extends AppElement {
     // ant server stop/start button
     if (this.appState?.config?.antServerEnabled) {
       buttons.push(html`
+      <button @click=${this.toggleAntServer}>${icon_ant_off}</button>
+    `)
+    }
+    /*
+    if (this.appState?.config?.antServerEnabled) {
+      buttons.push(html`
       <button @click=${this.toggleAntServer}>
         <div id="ant-off-icon">${icon_ant_off}</div>
         <div id="ant-on-icon">${icon_ant_on}</div>
       </button>
     `)
     }
-
+    */
 
     return buttons
   }
