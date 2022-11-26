@@ -10,34 +10,28 @@
   - Garmin mini ANT+ (ID 0x1009)
 */
 import log from 'loglevel'
-import Ant from 'ant-plus'
+import Ant from 'gd-ant-plus'
 import EventEmitter from 'node:events'
 
-function createAntManager () {
+function createAntReceiver(antStick) {
+  const stick = antStick
   const emitter = new EventEmitter()
-  const antStick3 = new Ant.GarminStick3()
-  
-  const heartrateSensor3 = new Ant.HeartRateSensor(antStick3)
-
-  heartrateSensor3.on('hbData', (data) => {
+  const heartRateSensor = new Ant.HeartRateSensor(stick)
+  heartRateSensor.on('hbData', (data) => {
     emitter.emit('heartrateMeasurement', { heartrate: data.ComputedHeartRate, batteryLevel: data.BatteryLevel })
   })
-
-  antStick3.on('startup', () => {
-    log.info('mini ANT+ stick found')
-    heartrateSensor3.attach(0, 0)
+  stick.on('startup', () => {
+    heartRateSensor.attach(0,0)
   })
-
-  antStick3.on('shutdown', () => {
-    log.info('mini ANT+ stick lost')
+  heartRateSensor.on('attached', () => {
+    log.info('Ant+ HRM Attached')
   })
-
-  if (!antStick3.open()) {
-    log.debug('mini ANT+ stick NOT found')
-  }
-
+  heartRateSensor.on('detached', () => {
+    log.info('Ant+ HRM Detached')
+  })
   return Object.assign(emitter, {
   })
+
 }
 
-export { createAntManager }
+export { createAntReceiver }

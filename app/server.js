@@ -14,7 +14,7 @@ import config from './tools/ConfigManager.js'
 import { createRowingStatistics } from './engine/RowingStatistics.js'
 import { createWebServer } from './WebServer.js'
 import { createPeripheralManager } from './ble/PeripheralManager.js'
-import { createAntManager } from './ant/AntManager2.js'
+import { createAntReceiver } from './ant/AntReceiver.js'
 import { createAntStick } from './ant/AntStick.js'
 import { AntServer } from './ant/AntServer.js'
 // eslint-disable-next-line no-unused-vars
@@ -197,6 +197,11 @@ if (config.heartrateMonitorANT) {
 // create the antStick server
 const antStick = createAntStick()
 const antServer = new AntServer(antStick)
+const antReceiver = new createAntReceiver(antStick)
+antReceiver.on('heartrateMeasurement', (heartrateMeasurement) => {
+  rowingStatistics.handleHeartrateMeasurement(heartrateMeasurement)
+})
+
 antStick.on('startup', () => {
   onAntStickStartup()
 })

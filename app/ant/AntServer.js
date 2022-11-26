@@ -20,12 +20,11 @@ const RF_CHANNEL = 57; // 2457 MHz
 const BROADCAST_INTERVAL = PERIOD / 32768; // seconds
 // this defines the series order that we broadcast the pages in order to meet Ant+ Spec requirements
 const PAGE_INTERLEAVING = [16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,80,80,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,16,16,22,17,16,16,17,22,81,81]
-//const PAGE_INTERLEAVING = [16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,80,80,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,16,16,22,22,81,81]
 const ASLEEP_STATE =    0b0010000
 const READY_STATE =     0b0100000
 const IN_USE_STATE =    0b0110000
 const FINISHED_STATE =  0b1010000
-const FLIP_LAP =       0b10000000 // used to flip the lap bit (future enhancement)
+const FLIP_LAP =       0b10000000 // used to flip the lap bit
 const PAGE_16_FLAGS =      0b0100 // Flags for some of the information being sent to Watch - No Heart Rate Sent, Distance Sent, Speed is Real
 const PAGE_22_FLAGS =      0b0001 // Flags for some of the informaiton being sent to Watch - Indicates that rowing machine is sending stroke count to watch
 
@@ -168,35 +167,42 @@ export class AntServer {
    */
   notifyMetrics(type, metrics) {
 
-    this.sessionStatus = metrics.sessionStatus
     this.totalMovingTime = metrics.totalMovingTime // in seconds, total session time
     this.totalNumberOfStrokes = metrics.totalNumberOfStrokes // in integers, total number of strokes in session
     this.totalLinearDistance = metrics.totalLinearDistance // in meters
-    this.cycleStrokeRate = metrics.cycleStrokeRate
+    this.cycleStrokeRate = Math.round(metrics.cycleStrokeRate) // stroke rate per minute rounded
     this.cycleLinearVelocity = Math.round(metrics.cycleLinearVelocity *1000) // each unit = 0.001 m/s
     this.cyclePower = Math.round(metrics.cyclePower) // we could use instantPower instead?
     this.dragFactor = Math.round(metrics.dragFactor -50) // drag factor as a raw resistance value (each unit = 0.5%)
     this.driveLength = Math.round(metrics.driveLength * 100) // used for stroke length. May be the wrong metric? (each unit = 0.01 m)
     // update sessionState and capabilities state
-    // we might want to use this to "flip" the lap switch whenever the rower moves from paused or waitingforstart to rowing?
-    switch (this.sessionStatus) {
+    // first we get the current lap bit state
+    let lapBit = this.capabilitiesState &= FLIP_LAP
+    // "flip" the lap switch if needed
+    // we essentially do this anytime the last session status doesn't match the new session status
+    if (this.sessionStatus != metrics.sessionStatus) {
+      lapBit ^= FLIP_LAP
+      log.debug('Lap Bit Flipped')
+    }
+    switch (metrics.sessionStatus) {
       case 'Rowing':
-        this.capabilitiesState = IN_USE_STATE
+        this.capabilitiesState = IN_USE_STATE + lapBit
         break
       case 'WaitingForStart':
-        this.capabilitiesState = READY_STATE
+        this.capabilitiesState = READY_STATE + lapBit
         break
       case 'Paused':
-        this.capabilitiesState = FINISHED_STATE
+        this.capabilitiesState = FINISHED_STATE + lapBit
         break
       case 'Stopped':
-        this.capabilitiesState = FINISHED_STATE
+        this.capabilitiesState = FINISHED_STATE + lapBit
         break
       default:
         log.error(`No Valid Session Status result found for ${this.sessionStatus}`)
-        this.capabilitiesState = READY_STATE
+        this.capabilitiesState = READY_STATE + lapBit
         break
     }
+    this.sessionStatus = metrics.sessionStatus
   }
 
   /**
@@ -217,7 +223,9 @@ export class AntServer {
     this.cycleLinearVelocity = 0
     this.cyclePower = 0
     this.dragFactor = 0
-    this.capabilitiesState = READY_STATE 
+    let lapBit = this.capabilitiesState &= FLIP_LAP // treat a reset like a lap
+    lapBit ^= FLIP_LAP
+    this.capabilitiesState = READY_STATE + lapBit
     this.driveLength = 0
     // we may one day use this to turn off broadcasting or stopping the machine?
   }
@@ -253,6 +261,7 @@ export class AntServer {
         ]
         if (this.sessionStatus === 'Rowing') {
           log.debug(`Page 16 Data Sent. Event=${this.eventCount}. Time=${this.accumulatedTime}. Distance=${this.accumulatedDistance}. Speed=${this.cycleLinearVelocity}.`)
+          hexString = Ant.Messages.intToLEHexArray(this.cycleLinearVelocity, 2)
           log.debug(`Hex Time=0x${this.accumulatedTime.toString(16)}. Hex Distance=0x${this.accumulatedDistance.toString(16)}. Hex Speed=0x${hexString}.`)
         }
         break
@@ -279,13 +288,13 @@ export class AntServer {
           0xFF, // Reserved
           0xFF, // Reserved
           ...Ant.Messages.intToLEHexArray(this.accumulatedStrokes, 1), // Stroke Count
-          ...Ant.Messages.intToLEHexArray(Math.round(this.cycleStrokeRate), 1), // Cadence / Stroke Rate
-          ...Ant.Messages.intToLEHexArray(Math.round(this.cyclePower), 2), // Instant Power (2 bytes) (Documentation is misleading? Looks like number needs to be multiplied by a factor of 100)
+          ...Ant.Messages.intToLEHexArray(this.cycleStrokeRate, 1), // Cadence / Stroke Rate
+          ...Ant.Messages.intToLEHexArray(this.cyclePower, 2), // Instant Power (2 bytes)
           ...Ant.Messages.intToLEHexArray((this.capabilitiesState +PAGE_22_FLAGS), 1)
         ]
         if (this.sessionStatus === 'Rowing') {
-          log.debug(`Page 22 Data Sent. Event=${this.eventCount}. Strokes=${this.accumulatedStrokes}. Stroke Rate=${Math.round(this.cycleStrokeRate)}. Power=${Math.round(this.cyclePower)}`)
-          hexString = Ant.Messages.intToLEHexArray(Math.round(this.cyclePower), 2)
+          log.debug(`Page 22 Data Sent. Event=${this.eventCount}. Strokes=${this.accumulatedStrokes}. Stroke Rate=${this.cycleStrokeRate}. Power=${this.cyclePower}`)
+          hexString = Ant.Messages.intToLEHexArray(this.cyclePower, 2)
           log.debug(`Hex Strokes=0x${this.accumulatedStrokes.toString(16)}. Hex Stroke Rate=0x${this.cycleStrokeRate.toString(16)}. Hex Power=0x${hexString}`)
         }
         break
