@@ -16,6 +16,8 @@ export const APP_STATE = {
     // true if upload to strava is enabled
     stravaUploadEnabled: false,
     // true if remote device shutdown is enabled
-    shutdownEnabled: false
+    shutdownEnabled: false,
+    // true if ant server is available
+    antServerEnabled: false
   }
 }

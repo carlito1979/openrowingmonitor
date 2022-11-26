@@ -104,6 +104,8 @@ export class AntServer {
    */
   stop() {
     const {stick, channel} = this;
+    log.info(`ANT+ server stopped [deviceId=${deviceId} channel=${channel}]`);
+
     this.broadcastInterval.cancel();
     const messages = [
       Ant.Messages.closeChannel(channel),
@@ -112,6 +114,8 @@ export class AntServer {
     for (let m of messages) {
       stick.write(m);
     }
+    this._isRunning = false
+    this.notifyStatus()
   }
 
   /**
@@ -209,6 +213,10 @@ export class AntServer {
    * The Server has reset metrics
    */
   notifyStatus(type) {
+    this.resetMetrics()
+  }
+
+  resetMetrics() {
     this.eventCount = 0;
     this.accumulatedPower = 0;
 

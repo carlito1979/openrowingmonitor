@@ -147,6 +147,10 @@ export function createApp (app) {
         if (socket)socket.send(JSON.stringify({ command: 'shutdown' }))
         break
       }
+      case 'toggleAntServer': {
+        if (socket)socket.send(JSON.stringify({ command: 'toggleAntServer' }))
+        break
+      }
       default: {
         console.error('no handler defined for action', action)
       }

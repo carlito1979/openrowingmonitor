@@ -7,7 +7,7 @@
 
 import { AppElement, html, css } from './AppElement.js'
 import { customElement, state } from 'lit/decorators.js'
-import { icon_undo, icon_expand, icon_compress, icon_poweroff, icon_bluetooth, icon_upload } from '../lib/icons.js'
+import { icon_undo, icon_expand, icon_compress, icon_poweroff, icon_bluetooth, icon_upload, icon_ant_off, icon_ant_on } from '../lib/icons.js'
 import './AppDialog.js'
 
 @customElement('dashboard-actions')
@@ -93,11 +93,24 @@ export class DashboardActions extends AppElement {
     `)
     }
 
+    // strava upload button
     if (this.appState?.config?.stravaUploadEnabled) {
       buttons.push(html`
       <button @click=${this.uploadTraining}>${icon_upload}</button>
     `)
     }
+
+    // ant server stop/start button
+    if (this.appState?.config?.antServerEnabled) {
+      buttons.push(html`
+      <button @click=${this.toggleAntServer}>
+        <div id="ant-off-icon">${icon_ant_off}</div>
+        <div id="ant-on-icon">${icon_ant_on}</div>
+      </button>
+    `)
+    }
+
+
     return buttons
   }
 
@@ -127,6 +140,10 @@ export class DashboardActions extends AppElement {
 
   reset () {
     this.sendEvent('triggerAction', { command: 'reset' })
+  }
+
+  toggleAntServer () {
+    this.sendEvent('tiggerAction', { command: 'toggleAntServer' })
   }
 
   switchPeripheralMode () {

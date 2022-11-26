@@ -197,7 +197,7 @@ if (config.heartrateMonitorANT) {
 // create the antStick server
 const antStick = createAntStick()
 const antServer = new AntServer(antStick)
-const antReceiver = new createAntReceiver(antStick)
+const antReceiver = createAntReceiver(antStick)
 antReceiver.on('heartrateMeasurement', (heartrateMeasurement) => {
   rowingStatistics.handleHeartrateMeasurement(heartrateMeasurement)
 })
@@ -205,10 +205,19 @@ antReceiver.on('heartrateMeasurement', (heartrateMeasurement) => {
 antStick.on('startup', () => {
   onAntStickStartup()
 })
+
 try {
   startAnt()
 } catch (error) {
   log.error('Something went wrong with ANT Server', error)
+}
+
+function toggleAntServer() {
+  if (antServer.isRunning) {
+    antServer.stop()
+  } else {
+    antServer.start()
+  }
 }
 
 function onAntStickStartup() {
@@ -257,6 +266,9 @@ webServer.on('messageReceived', async (message, client) => {
       break
     case 'stravaAuthorizationCode':
       workoutUploader.stravaAuthorizationCode(message.data)
+      break
+    case 'toggleAntServer':
+      toggleAnt()
       break
     default:
       log.warn('invalid command received:', message)
