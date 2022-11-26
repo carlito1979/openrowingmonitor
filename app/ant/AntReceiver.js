@@ -22,12 +22,13 @@ function createAntReceiver(antStick) {
   })
   stick.on('startup', () => {
     heartRateSensor.attach(0,0)
+    log.debug('Ant+ Startup - HRM Attach')
   })
   heartRateSensor.on('attached', () => {
-    log.info('Ant+ HRM Attached')
+    log.info('Ant+ HRM Scanner Ready')
   })
   heartRateSensor.on('detached', () => {
-    log.info('Ant+ HRM Detached')
+    log.info('Ant+ HRM Scanner Detached')
   })
   return Object.assign(emitter, {
   })

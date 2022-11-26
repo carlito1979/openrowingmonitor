@@ -245,6 +245,7 @@ export class AntServer {
     this.accumulatedTime = Math.trunc(this.totalMovingTime * 4) // each second = 4 units for elapsed time in Ant+
     this.accumulatedTime &= 0xFF
     var data = []
+    let lapBit = this.capabilitiesState &= FLIP_LAP
     var hexString = ''
     // determine which data page to write
     switch (PAGE_INTERLEAVING[this.eventCount]) {
@@ -295,7 +296,7 @@ export class AntServer {
         if (this.sessionStatus === 'Rowing') {
           log.debug(`Page 22 Data Sent. Event=${this.eventCount}. Strokes=${this.accumulatedStrokes}. Stroke Rate=${this.cycleStrokeRate}. Power=${this.cyclePower}`)
           hexString = Ant.Messages.intToLEHexArray(this.cyclePower, 2)
-          log.debug(`Hex Strokes=0x${this.accumulatedStrokes.toString(16)}. Hex Stroke Rate=0x${this.cycleStrokeRate.toString(16)}. Hex Power=0x${hexString}`)
+          log.debug(`Hex Strokes=0x${this.accumulatedStrokes.toString(16)}. Hex Stroke Rate=0x${this.cycleStrokeRate.toString(16)}. Hex Power=0x${hexString}. Lap Bit=0x${lapBit.toString(2)}`)
         }
         break
       case 80: // 0x50 - Common Page for Manufacturers Identification (approx twice a minute)
@@ -333,81 +334,3 @@ export class AntServer {
   }
 
 }
-
-
-/*
-Equipment Type: Rower = 22 / 0x16
-Data to send
-0x10 General Data 8.5.2
-  Equipment Type 0x16 (Rower)
-  Elapsed Time 1 byte - accumulated, but rolls over so &= 0xFF. 1 = 0.25sec
-  Distance Travelled 1 byte- accumulated, but rolls over so &= 0xFF. 1 = 1m
-  Speed - translate 500m pace into m/s value 1 = 0.001 m/s 2 bytes 2min 500m time = 4.170 m/s = 0x104A
-  Capabilities/FE State
-0x16 Specific Rower Data 8.6.4
-  Stroke Count 1 byte - accumulated with roll over so &- 0xFF 1 = 1 stroke
-  Cadence/Stroke Rate 1 byte strokes/min 
-  Instant Power 2 bytes - 1 = 1 watt, 240W = 0xF0
-  Capabilities/FE State
-
-
-
-8.5.2.2 Elapsed Time
-
-8.5.2.3 Distance Travelled
-
-8.5.2.4 Speed
-2 byte value in 0.001 m/s
-
-
-8.5.2.6 Capabilities Bit Field
-0100: 4 0x4
-No HR Source, Transmitting Distance Travelled and Real Speed
-
-
-8.5.3 Data Page 17 (0x11) - General Settings
-Bytes
-0    1    2    3    4 - 5  6    7
-0x11|0xFF|0xFF|0x??|0x7FFF|0x??|000???x
-3 = Stroke Length
-6 = Resistance Level
-7 = FE State Bit Fields (last 4 bits)
-FE State
-000:0 Reserved
-001:1 OFF
-010:2 READY
-011:3 IN_USE
-100:4 FINISHED (PAUSED)
-+ Lap Toggle Bit
-
-
-8.5.3.1 Cycle Length = Rower = Stroke Length
-
-
-8.5.3.3 Resistance Level (OPTIONAL) - defined 0-200, could use to pass drag factor?
-
-
-8.5.4 Data Page 18 (0x12) - General FE Metabolic Data (Optional, Not being used)
-
-
-8.6.4 Page 22 (0x16) - Specific Rower Data
-Bytes
-0    1    2    3    4    5 - 6  7
-0x16|0xFF|0xFF|0x??|0x??|0x????|
-3 = Accumulated Stroke Count
-4 = Stroke Rate (Cadence) in SPM
-5/6 = Power in watts - 0xFFFF = invalid
-7 = Capabilities and FE State
-Use to indicate accumulated stroke count is sent in byte 3
-
-
-
-
-
-
-
-
-
-
-
-*/
