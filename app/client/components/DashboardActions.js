@@ -64,6 +64,7 @@ export class DashboardActions extends AppElement {
   render () {
     return html`
     <button @click=${this.reset}>${icon_undo}</button>
+    <button @click=${this.toggleAntServer}>${icon_upload}</button>
     ${this.renderOptionalButtons()}
     <button @click=${this.switchPeripheralMode}>${icon_bluetooth}</button>
     <div class="peripheral-mode">${this.peripheralMode()}</div>
@@ -100,22 +101,12 @@ export class DashboardActions extends AppElement {
     `)
     }
 
-    // ant server stop/start button
-    if (this.appState?.config?.antServerEnabled) {
-      buttons.push(html`
-      <button @click=${this.toggleAntServer}>${icon_ant_off}</button>
-    `)
-    }
-    /*
-    if (this.appState?.config?.antServerEnabled) {
-      buttons.push(html`
-      <button @click=${this.toggleAntServer}>
-        <div id="ant-off-icon">${icon_ant_off}</div>
-        <div id="ant-on-icon">${icon_ant_on}</div>
-      </button>
-    `)
-    }
-    */
+    // // ant server stop/start button
+    // if (this.appState?.config?.antServerEnabled) {
+    //   buttons.push(html`
+    //   <button @click=${this.toggleAntServer}>${icon_upload}</button>
+    // `)
+    // }
 
     return buttons
   }
