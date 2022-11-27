@@ -1,3 +1,15 @@
+'use string'
+/*
+  Open Rowing Monitor, https://github.com/laberning/openrowingmonitor
+
+  Required by AntServer 
+  This code taken directly from https://github.com/ptx2/gymnasticon without modification
+
+  Requires an ANT+ USB stick, the following models might work:
+  - Garmin USB or USB2 ANT+ or an off-brand clone of it (ID 0x1008)
+  - Garmin mini ANT+ (ID 0x1009)
+*/
+
 import {EventEmitter} from 'node:events';
 
 /**

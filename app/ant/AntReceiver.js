@@ -4,6 +4,7 @@
 
   This manager creates a module to listen to ANT+ devices.
   This currently can be used to get the heart rate from ANT+ heart rate sensors.
+  This is a simplified version of the original AntManager, as the new Ant implementation simplifies this module
 
   Requires an ANT+ USB stick, the following models might work:
   - Garmin USB or USB2 ANT+ or an off-brand clone of it (ID 0x1008)

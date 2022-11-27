@@ -185,23 +185,19 @@ if (config.heartrateMonitorBLE) {
   })
 }
 
-if (config.heartrateMonitorANT) {
-/* old code 
-  const antManager = createAntManager()
-  antManager.on('heartrateMeasurement', (heartrateMeasurement) => {
-    rowingStatistics.handleHeartrateMeasurement(heartrateMeasurement)
-  })
-*/
-}
-
 // create the antStick server
+// This can't be done via an option like the HRM is, but we do need to figure out what happens if the user doesn't have an Ant stick attached
 const antStick = createAntStick()
 const antServer = new AntServer(antStick)
-const antReceiver = createAntReceiver(antStick)
-antReceiver.on('heartrateMeasurement', (heartrateMeasurement) => {
-  rowingStatistics.handleHeartrateMeasurement(heartrateMeasurement)
-})
 
+if (config.heartrateMonitorANT) {
+  // Receiving heart rate data from ANT+ is still done via user options
+  const antReceiver = createAntReceiver(antStick)
+  antReceiver.on('heartrateMeasurement', (heartrateMeasurement) => {
+    rowingStatistics.handleHeartrateMeasurement(heartrateMeasurement)
+  })
+}
+// This code largely taken from https://github.com/ptx2/gymnasticon without much modification
 antStick.on('startup', () => {
   onAntStickStartup()
 })
@@ -213,11 +209,11 @@ try {
 }
 
 function toggleAntServer() {
-  console.log('toggleAntServer - funciton in server.js')
+  console.log('toggleAntServer - function in server.js')
   if (antServer.isRunning) {
-    antServer.stop()
+    stopAnt()
   } else {
-    antServer.start()
+    onAntStickStartup()
   }
 }
 

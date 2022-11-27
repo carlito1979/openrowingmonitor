@@ -3,7 +3,11 @@
   Open Rowing Monitor, https://github.com/laberning/openrowingmonitor
 
   This manager creates a module to listen to ANT+ devices.
-  This currently can be used to get the heart rate from ANT+ heart rate sensors.
+  This creates a module that can broadcast rowing metrics over ANT+ via the Fitness Equipment Profile
+  Once connected to a compatible Garmin Watch your indoor rowing activity will include Strokes, Stroke Rate, Pace/Speed and Power information
+
+  This code is based on the previous work of PTX2 on Gymnasticon to build an interface between obsolete/propriertary exercise bikes and training apps like Zwift
+  https://github.com/ptx2/gymnasticon
 
   Requires an ANT+ USB stick, the following models might work:
   - Garmin USB or USB2 ANT+ or an off-brand clone of it (ID 0x1008)
