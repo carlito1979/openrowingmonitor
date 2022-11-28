@@ -64,7 +64,7 @@ export class DashboardActions extends AppElement {
   render () {
     return html`
     <button @click=${this.reset}>${icon_undo}</button>
-    <button @click=${this.toggleAntServer}>${icon_upload}</button>
+    <button @click=${this.toggleAntServer}>${icon_ant_on}</button>
     ${this.renderOptionalButtons()}
     <button @click=${this.switchPeripheralMode}>${icon_bluetooth}</button>
     <div class="peripheral-mode">${this.peripheralMode()}</div>
