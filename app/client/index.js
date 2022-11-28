@@ -32,11 +32,14 @@ export class App extends LitElement {
     // once any child component sends this CustomEvent we update the global state according
     // to the changes that were passed to us
     this.addEventListener('appStateChanged', (event) => {
+      console.log('Appstate Changed')
       this.updateState(event.detail)
     })
 
     // notify the app about the triggered action
     this.addEventListener('triggerAction', (event) => {
+      console.log('Event Listener Fired')
+      console.log(event.detail)
       this.app.handleAction(event.detail)
     })
   }

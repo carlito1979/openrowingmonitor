@@ -7,7 +7,7 @@
 
 import { AppElement, html, css } from './AppElement.js'
 import { customElement, state } from 'lit/decorators.js'
-import { icon_undo, icon_expand, icon_compress, icon_poweroff, icon_bluetooth, icon_upload, icon_ant_off, icon_ant_on } from '../lib/icons.js'
+import { icon_undo, icon_expand, icon_compress, icon_poweroff, icon_bluetooth, icon_upload } from '../lib/icons.js'
 import './AppDialog.js'
 
 @customElement('dashboard-actions')
@@ -64,7 +64,6 @@ export class DashboardActions extends AppElement {
   render () {
     return html`
     <button @click=${this.reset}>${icon_undo}</button>
-    <button @click=${this.toggleAntServer}>${icon_ant_on}</button>
     ${this.renderOptionalButtons()}
     <button @click=${this.switchPeripheralMode}>${icon_bluetooth}</button>
     <div class="peripheral-mode">${this.peripheralMode()}</div>
@@ -101,12 +100,12 @@ export class DashboardActions extends AppElement {
     `)
     }
 
-    // // ant server stop/start button
-    // if (this.appState?.config?.antServerEnabled) {
-    //   buttons.push(html`
-    //   <button @click=${this.toggleAntServer}>${icon_upload}</button>
-    // `)
-    // }
+    // ant server stop/start button
+    if (this.appState?.config?.antServerEnabled) {
+      buttons.push(html`
+      <button @click=${this.toggleAntServer}>${icon_upload}</button>
+    `)
+    }
 
     return buttons
   }
