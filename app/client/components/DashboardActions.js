@@ -72,7 +72,6 @@ export class DashboardActions extends AppElement {
   }
 
   renderOptionalButtons () {
-    console.log(`DashboardActions.js: ${this.appState?.config?.antServerEnabled}`) // debugcode
     const buttons = []
     // changing to fullscreen mode only makes sence when the app is openend in a regular
     // webbrowser (kiosk and standalone mode are always in fullscreen view) and if the
