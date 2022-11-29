@@ -175,7 +175,7 @@ rowingStatistics.on('rowingStopped', (metrics) => {
   webServer.notifyClients('metrics', metrics)
   peripheralManager.notifyMetrics('metricsUpdate', metrics)
   antServer.notifyMetrics('metricsUpdate', metrics)
-  workoutRecorder.writeRecordings(metrics)
+  workoutRecorder.writeRecordings() // metrics wasn't required?
 })
 
 if (config.heartrateMonitorBLE) {
@@ -209,7 +209,7 @@ try {
 }
 
 function toggleAntServer() {
-  console.log('toggleAntServer - function in server.js')
+  console.log('toggleAntServer - function in server.js') // debugcode
   if (antServer.isRunning) {
     stopAnt()
   } else {

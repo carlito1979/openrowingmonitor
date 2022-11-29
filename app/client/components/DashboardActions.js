@@ -72,6 +72,7 @@ export class DashboardActions extends AppElement {
   }
 
   renderOptionalButtons () {
+    console.log(`DashboardActions.js: ${this.appState?.config?.antServerEnabled}`) // debugcode
     const buttons = []
     // changing to fullscreen mode only makes sence when the app is openend in a regular
     // webbrowser (kiosk and standalone mode are always in fullscreen view) and if the
@@ -100,13 +101,13 @@ export class DashboardActions extends AppElement {
     `)
     }
 
-    // ant server stop/start button
+/*    // ant server stop/start button
     if (this.appState?.config?.antServerEnabled) {
       buttons.push(html`
       <button @click=${this.toggleAntServer}>${icon_upload}</button>
     `)
     }
-
+*/
     return buttons
   }
 
@@ -136,10 +137,11 @@ export class DashboardActions extends AppElement {
 
   reset () {
     this.sendEvent('triggerAction', { command: 'reset' })
+    this.toggleAntServer // debugcode
   }
 
   toggleAntServer () {
-    console.log('toggleAntServer - DashboardActions.js')
+    console.log('toggleAntServer - DashboardActions.js')  // debugcode
     this.sendEvent('tiggerAction', { command: 'toggleAntServer' })
   }
 

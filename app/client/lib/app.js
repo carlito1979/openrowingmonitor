@@ -135,6 +135,7 @@ export function createApp (app) {
         break
       }
       case 'reset': {
+        console.log('reset - app.js') // debugcode
         resetFields()
         if (socket)socket.send(JSON.stringify({ command: 'reset' }))
         break
@@ -148,7 +149,7 @@ export function createApp (app) {
         break
       }
       case 'toggleAntServer': {
-        console.log('toggleAntServer - app.js')
+        console.log('toggleAntServer - app.js') // debugcode
         if (socket)socket.send(JSON.stringify({ command: 'toggleAntServer' }))
         break
       }
