@@ -107,7 +107,7 @@ export class AntServer {
    * Stop the ANT+ server (stop broadcasting and unassign channel).
    */
   stop() {
-    const {stick, channel} = this;
+    const {stick, channel, deviceId} = this;
     log.info(`ANT+ server stopped [deviceId=${deviceId} channel=${channel}]`);
 
     this.broadcastInterval.cancel();
