@@ -248,6 +248,8 @@ workoutUploader.on('resetWorkout', () => {
 
 const webServer = createWebServer()
 webServer.on('messageReceived', async (message, client) => {
+  console.log('webServer messageReceived - server.js') // debug code
+  console.log(message) // debug code
   switch (message.command) {
     case 'switchPeripheralMode':
       peripheralManager.switchPeripheralMode()
@@ -279,7 +281,6 @@ webServer.on('clientConnected', (client) => {
 
 // todo: extract this into some kind of state manager
 function getConfig () {
-  console.log(`getConfig() - Server.js - ${config.antServerEnabled} / ${!!config.antServerEnabled}`) // debug code
   return {
     peripheralMode: peripheralManager.getPeripheralMode(),
     stravaUploadEnabled: !!config.stravaClientId && !!config.stravaClientSecret,
