@@ -100,13 +100,13 @@ export class DashboardActions extends AppElement {
     `)
     }
 
-/*    // ant server stop/start button
+    // ant server stop/start button
     if (this.appState?.config?.antServerEnabled) {
       buttons.push(html`
       <button @click=${this.toggleAntServer}>${icon_upload}</button>
     `)
     }
-*/
+
     return buttons
   }
 
@@ -136,7 +136,6 @@ export class DashboardActions extends AppElement {
 
   reset () {
     this.sendEvent('triggerAction', { command: 'reset' })
-    this.toggleAntServer // debugcode
   }
 
   toggleAntServer () {
