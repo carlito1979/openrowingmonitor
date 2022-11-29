@@ -84,6 +84,7 @@ export default {
   // - Garmin USB or USB2 ANT+ or an off-brand clone of it (ID 0x1008)
   // - Garmin mini ANT+ (ID 0x1009)
   heartrateMonitorANT: false,
+  antServerEnabled: false, // in theory this should be used to also define use of an ANT heartrate monitor, but for now we keep it separate
 
   // The directory in which to store user specific content
   // currently this directory holds the recorded training sessions
