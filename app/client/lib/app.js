@@ -72,6 +72,7 @@ export function createApp (app) {
         switch (message.type) {
           case 'config': {
             app.updateState({ ...app.getState(), config: data })
+            console.log(`Config Data: ${data}`) // debug code
             break
           }
           case 'metrics': {

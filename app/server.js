@@ -215,6 +215,7 @@ function toggleAntServer() {
   } else {
     onAntStickStartup()
   }
+  webServer.notifyClients('config', getConfig())
 }
 
 function onAntStickStartup() {
