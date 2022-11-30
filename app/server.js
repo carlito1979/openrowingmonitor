@@ -285,7 +285,8 @@ function getConfig () {
     peripheralMode: peripheralManager.getPeripheralMode(),
     stravaUploadEnabled: !!config.stravaClientId && !!config.stravaClientSecret,
     shutdownEnabled: !!config.shutdownCommand,
-    antServerEnabled: !!config.antServerEnabled
+    antServerEnabled: !!config.antServerEnabled,
+    antServerRunning: antServer.isRunning
   }
 }
 

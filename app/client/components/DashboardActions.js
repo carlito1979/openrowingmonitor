@@ -151,7 +151,9 @@ export class DashboardActions extends AppElement {
 
   toggleAntServer () {
     console.log('toggleAntServer - DashboardActions.js')  // debugcode
+    console.log(`Before: ${this.appState?.config?.antServerRunning}`)
     this.sendEvent('triggerAction', { command: 'toggleAntServer' })
+    console.log(`After: ${this.appState?.config?.antServerRunning}`)
   }
 
   switchPeripheralMode () {

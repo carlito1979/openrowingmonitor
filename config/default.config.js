@@ -85,6 +85,7 @@ export default {
   // - Garmin mini ANT+ (ID 0x1009)
   heartrateMonitorANT: false,
   antServerEnabled: false, // in theory this should be used to also define use of an ANT heartrate monitor, but for now we keep it separate
+  antServerRunning: false, // we'll use this to define if the AntServer is running or not, and also used to define startup behaviour
 
   // The directory in which to store user specific content
   // currently this directory holds the recorded training sessions
