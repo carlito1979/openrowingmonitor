@@ -111,10 +111,7 @@ export class DashboardActions extends AppElement {
     // ant server stop/start button
     if (this.appState?.config?.antServerEnabled) {
       buttons.push(html`
-      <button @click=${this.toggleAntServer}>
-        <div id="ant-off-icon">${icon_ant_off}</div>
-        <div id="ant-on-icon">${icon_ant_on}</div>
-      </button>
+      <button @click=${this.toggleAntServer}>${this.antMode()}</button>
     `)
     }
 
@@ -151,9 +148,13 @@ export class DashboardActions extends AppElement {
 
   toggleAntServer () {
     console.log('toggleAntServer - DashboardActions.js')  // debugcode
-    console.log(`Before: ${this.appState?.config?.antServerRunning}`)
     this.sendEvent('triggerAction', { command: 'toggleAntServer' })
-    console.log(`After: ${this.appState?.config?.antServerRunning}`)
+  }
+
+  antMode() {
+    console.log('toggleAntServer - DashboardActions.js')  // debugcode
+    console.log(`AntServerRunning: ${this.appState?.config?.antServerRunning}`)
+    return this.appState?.config?.antServerRunning ? icon_ant_on : icon_ant_off
   }
 
   switchPeripheralMode () {
