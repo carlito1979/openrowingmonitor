@@ -267,7 +267,7 @@ webServer.on('messageReceived', async (message, client) => {
       workoutUploader.stravaAuthorizationCode(message.data)
       break
     case 'toggleAntServer':
-      console.log('toggleAntServer - server.js')
+      console.log('toggleAntServer - server.js') // debug code
       toggleAntServer()
       break
     default:

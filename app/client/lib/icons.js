@@ -16,14 +16,14 @@ export const icon_paddle = svg`
     <path fill="currentColor" d="M 93.111861,469.41843 59.998156,436.30471 c -5.226842,-5.22684 -8.774914,-17.24659 -3.548088,-22.47344 l 2.407166,-2.40717 c 5.226836,-5.22685 24.059868,3.18854 30.46142,6.88449 L 304.88751,202.73974 c 10.94682,-40.85409 37.06645,-91.55629 68.81223,-123.310429 L 408.34455,44.78448 c 20.89903,-20.899007 26.01127,-21.415839 42.77554,-4.65156 l 38.18338,38.183384 c 14.99224,14.992241 16.22764,21.856706 -4.67138,42.755726 l -34.65319,34.6532 c -30.66405,30.66404 -82.45634,57.8654 -123.31038,68.8122 L 111.09965,440.10631 c 3.69593,6.40153 12.11135,25.23461 6.88448,30.46143 l -2.40718,2.40716 c -5.21849,5.21846 -17.23824,1.67038 -22.465089,-3.55647 z"/>
   </svg>`
 export const icon_ant_on = svg`
-  <svg aria-hidden="true" focusable="false" class="icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <svg aria-hidden="true" focusable="false" class="icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
     <path d="M18.364 19.364a9 9 0 1 0 -12.728 0"/>
     <path d="M15.536 16.536a5 5 0 1 0 -7.072 0"/>
     <circle cx="12" cy="13" r="1"/>
   </svg>`
 export const icon_ant_off = svg`
-  <svg aria-hidden="true" focusable="false" class="icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <svg aria-hidden="true" focusable="false" class="icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
     <path d="M18.364 19.364a9 9 0 0 0 -9.721 -14.717m-2.488 1.509a9 9 0 0 0 -.519 13.208"/>
     <path d="M15.536 16.536a5 5 0 0 0 -3.536 -8.536m-3.001 1a5 5 0 0 0 -.535 7.536"/>

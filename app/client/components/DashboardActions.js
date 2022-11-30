@@ -7,7 +7,7 @@
 
 import { AppElement, html, css } from './AppElement.js'
 import { customElement, state } from 'lit/decorators.js'
-import { icon_undo, icon_expand, icon_compress, icon_poweroff, icon_bluetooth, icon_upload } from '../lib/icons.js'
+import { icon_undo, icon_expand, icon_compress, icon_poweroff, icon_bluetooth, icon_upload, icon_ant_on, icon_ant_off } from '../lib/icons.js'
 import './AppDialog.js'
 
 @customElement('dashboard-actions')
@@ -38,6 +38,14 @@ export class DashboardActions extends AppElement {
 
     #windowed-icon {
       display: none;
+    }
+
+    #ant-off-icon {
+      display: var(--display-button-ant-off);
+    }
+
+    #ant-on-icon {
+      display: var(--display-button-ant-on);
     }
 
     .icon {
@@ -103,7 +111,10 @@ export class DashboardActions extends AppElement {
     // ant server stop/start button
     if (this.appState?.config?.antServerEnabled) {
       buttons.push(html`
-      <button @click=${this.toggleAntServer}>${icon_upload}</button>
+      <button @click=${this.toggleAntServer}>
+        <div id="ant-off-icon">${icon_ant_off}</div>
+        <div id="ant-on-icon">${icon_ant_on}</div>
+      </button>
     `)
     }
 
