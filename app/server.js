@@ -213,7 +213,9 @@ function checkAntStickWorking() {
   }
   if (!antStick.open()) {
     log.error('Failed to open ANT+ stick');
+    return
   }
+  antServer.confirmStickExists();
 }
 
 function toggleAntServer() {
@@ -287,7 +289,7 @@ function getConfig () {
     peripheralMode: peripheralManager.getPeripheralMode(),
     stravaUploadEnabled: !!config.stravaClientId && !!config.stravaClientSecret,
     shutdownEnabled: !!config.shutdownCommand,
-    antServerEnabled: !!config.antServerEnabled && !!antStick.is_present(),
+    antServerEnabled: !!config.antServerEnabled && !!antServer.stickExists,
     antServerRunning: antServer.isRunning
   }
 }

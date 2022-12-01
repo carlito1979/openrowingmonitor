@@ -77,6 +77,7 @@ export class AntServer {
     this.broadcastInterval = new Timer(BROADCAST_INTERVAL);
     this.broadcastInterval.on('timeout', this.onBroadcastInterval.bind(this));
     this._isRunning = false;
+    this._stickExists = false;
   }
 
   /**
@@ -97,6 +98,15 @@ export class AntServer {
     }
     this.broadcastInterval.reset();
     this._isRunning = true;
+  }
+
+  confirmStickExists() {
+    log.debug('ANT+ Stick Exists')
+    this._stickExists = true
+  }
+
+  get stickExists() {
+    return this._stickExists;
   }
 
   get isRunning() {
