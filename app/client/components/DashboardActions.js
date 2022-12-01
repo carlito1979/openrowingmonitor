@@ -40,14 +40,6 @@ export class DashboardActions extends AppElement {
       display: none;
     }
 
-    #ant-off-icon {
-      display: var(--display-button-ant-off);
-    }
-
-    #ant-on-icon {
-      display: var(--display-button-ant-on);
-    }
-
     .icon {
       height: 1.7em;
     }
@@ -147,13 +139,10 @@ export class DashboardActions extends AppElement {
   }
 
   toggleAntServer () {
-    console.log('toggleAntServer - DashboardActions.js')  // debugcode
     this.sendEvent('triggerAction', { command: 'toggleAntServer' })
   }
 
   antMode() {
-    console.log('toggleAntServer - DashboardActions.js')  // debugcode
-    console.log(`AntServerRunning: ${this.appState?.config?.antServerRunning}`)
     return this.appState?.config?.antServerRunning ? icon_ant_on : icon_ant_off
   }
 

@@ -209,7 +209,6 @@ try {
 }
 
 function toggleAntServer() {
-  console.log('toggleAntServer - function in server.js') // debugcode
   if (antServer.isRunning) {
     stopAnt()
   } else {
@@ -249,8 +248,6 @@ workoutUploader.on('resetWorkout', () => {
 
 const webServer = createWebServer()
 webServer.on('messageReceived', async (message, client) => {
-  console.log('webServer messageReceived - server.js') // debug code
-  console.log(message) // debug code
   switch (message.command) {
     case 'switchPeripheralMode':
       peripheralManager.switchPeripheralMode()
@@ -268,7 +265,6 @@ webServer.on('messageReceived', async (message, client) => {
       workoutUploader.stravaAuthorizationCode(message.data)
       break
     case 'toggleAntServer':
-      console.log('toggleAntServer - server.js') // debug code
       toggleAntServer()
       break
     default:
@@ -286,7 +282,7 @@ function getConfig () {
     peripheralMode: peripheralManager.getPeripheralMode(),
     stravaUploadEnabled: !!config.stravaClientId && !!config.stravaClientSecret,
     shutdownEnabled: !!config.shutdownCommand,
-    antServerEnabled: !!config.antServerEnabled,
+    antServerEnabled: !!config.antServerEnabled && !!antStick.is_present,
     antServerRunning: antServer.isRunning
   }
 }

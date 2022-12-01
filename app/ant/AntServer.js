@@ -100,7 +100,6 @@ export class AntServer {
   }
 
   get isRunning() {
-    console.log(this._isRunning) // debug code
     return this._isRunning;
   }
 
