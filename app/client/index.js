@@ -37,7 +37,6 @@ export class App extends LitElement {
 
     // notify the app about the triggered action
     this.addEventListener('triggerAction', (event) => {
-      console.log(event.detail)
       this.app.handleAction(event.detail)
     })
   }

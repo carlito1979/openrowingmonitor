@@ -186,43 +186,27 @@ if (config.heartrateMonitorBLE) {
 }
 
 // create the antStick server
-// This can't be done via an option like the HRM is, but we do need to figure out what happens if the user doesn't have an Ant stick attached
-const antStick = createAntStick()
-const antServer = new AntServer(antStick)
+// This can't be done via an option like the HRM is, but the code will still run just fine even if the user doesn't have an antstick attached
+const antStick = createAntStick() // we pass through the config value so we warn if the user was expecting a stick and it isn't detected
+const antServer = new AntServer(antStick) 
 
-if (config.heartrateMonitorANT) {
-  // Receiving heart rate data from ANT+ is still done via user options
-  const antReceiver = createAntReceiver(antStick)
-  antReceiver.on('heartrateMeasurement', (heartrateMeasurement) => {
-    rowingStatistics.handleHeartrateMeasurement(heartrateMeasurement)
-  })
-}
-// This code largely taken from https://github.com/ptx2/gymnasticon without much modification
+// We set up an AntServer regardless of user wishes, but we only start the server at startup only if they expressly wish us to
+// If the user has set antServerEnabled to false then after this step there will be no way in the Web UI to start the AntServer
 antStick.on('startup', () => {
-  onAntStickStartup()
+  if (!!config.antServerRunning && !!config.antServerEnabled) { 
+    startAntServer()
+  } else {
+    stopAntServer()
+  }
 })
 
 try {
-  startAnt()
+  checkAntStickWorking()
 } catch (error) {
-  log.error('Something went wrong with ANT Server', error)
+  log.error('Something went wrong with the ANT Stick', error)
 }
 
-function toggleAntServer() {
-  if (antServer.isRunning) {
-    stopAnt()
-  } else {
-    onAntStickStartup()
-  }
-  webServer.notifyClients('config', getConfig())
-}
-
-function onAntStickStartup() {
-  log.info('ANT+ stick opened')
-  antServer.start()
-}
-
-function startAnt() {
+function checkAntStickWorking() {
   if (!antStick.is_present()) {
     log.info('No ANT+ stick was found')
     return
@@ -232,11 +216,32 @@ function startAnt() {
   }
 }
 
-function stopAnt() {
+function toggleAntServer() {
+  if (antServer.isRunning) {
+    stopAntServer()
+  } else {
+    startAntServer()
+  }
+  webServer.notifyClients('config', getConfig())
+}
+
+function startAntServer() {
+  log.info('Starting ANT+ Server')
+  antServer.start()
+}
+
+function stopAntServer() {
   log.info('Stopping ANT+ Server')
   antServer.stop()
 }
 
+if (config.heartrateMonitorANT) {
+  // Receiving heart rate data from ANT+ is still done via user options
+  const antReceiver = createAntReceiver(antStick)
+  antReceiver.on('heartrateMeasurement', (heartrateMeasurement) => {
+    rowingStatistics.handleHeartrateMeasurement(heartrateMeasurement)
+  })
+}
 
 workoutUploader.on('authorizeStrava', (data, client) => {
   webServer.notifyClient(client, 'authorizeStrava', data)
@@ -278,8 +283,6 @@ webServer.on('clientConnected', (client) => {
 
 // todo: extract this into some kind of state manager
 function getConfig () {
-  console.log(`Config Antserver : ${!!config.antServerEnabled} : ${!!antStick.is_present()} : ${!!config.antServerEnabled && !!antStick.is_present()}`) // debug code
-  console.log(`Config Antserver : ${config.antServerEnabled} : ${antStick.is_present()} : ${config.antServerEnabled && antStick.is_present()}`) // debug code
   return {
     peripheralMode: peripheralManager.getPeripheralMode(),
     stravaUploadEnabled: !!config.stravaClientId && !!config.stravaClientSecret,

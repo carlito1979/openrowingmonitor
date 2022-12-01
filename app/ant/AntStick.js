@@ -11,6 +11,7 @@
 */
 
 import Ant from 'gd-ant-plus';
+import log from 'loglevel';
 
 /**
  * Create ANT+ stick.
