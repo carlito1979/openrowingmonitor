@@ -278,13 +278,13 @@ webServer.on('clientConnected', (client) => {
 
 // todo: extract this into some kind of state manager
 function getConfig () {
-  console.log(`Config Antserver : ${!!config.antServerEnabled} : ${!!antStick.is_present} : ${!!config.antServerEnabled && !!antStick.is_present}`) // debug code
-  console.log(`Config Antserver : ${config.antServerEnabled} : ${antStick.is_present} : ${config.antServerEnabled && antStick.is_present}`) // debug code
+  console.log(`Config Antserver : ${!!config.antServerEnabled} : ${!!antStick.is_present()} : ${!!config.antServerEnabled && !!antStick.is_present()}`) // debug code
+  console.log(`Config Antserver : ${config.antServerEnabled} : ${antStick.is_present()} : ${config.antServerEnabled && antStick.is_present()}`) // debug code
   return {
     peripheralMode: peripheralManager.getPeripheralMode(),
     stravaUploadEnabled: !!config.stravaClientId && !!config.stravaClientSecret,
     shutdownEnabled: !!config.shutdownCommand,
-    antServerEnabled: !!config.antServerEnabled && !!antStick.is_present,
+    antServerEnabled: !!config.antServerEnabled && !!antStick.is_present(),
     antServerRunning: antServer.isRunning
   }
 }
