@@ -21,13 +21,15 @@ function createPm5Peripheral (controlCallback, options) {
   const gapService = new GapService()
   const controlService = new Pm5ControlService()
   const rowingService = new Pm5RowingService()
-
+ 
   bleno.on('stateChange', (state) => {
+    log.debug(`ble statechange: ${state}`) // debug code
     triggerAdvertising(state)
   })
 
   bleno.on('advertisingStart', (error) => {
     if (!error) {
+      log.debug(`ble advertising start`) // debug code
       bleno.setServices(
         [gapService, deviceInformationService, controlService, rowingService],
         (error) => {
@@ -89,11 +91,14 @@ function createPm5Peripheral (controlCallback, options) {
 
   // present current rowing metrics to C2-PM5 central
   function notifyData (type, data) {
+    log.debug(`ble notify data: ${type}`) // debug code
+    log.debug(`ble notify data: ${data}`) // debug code
     rowingService.notifyData(type, data)
   }
 
   // present current rowing status to C2-PM5 central
   function notifyStatus (status) {
+    log.debug(`ble notify status: ${status}`) // debug code
   }
 
   return {
