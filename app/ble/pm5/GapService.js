@@ -22,9 +22,9 @@ export default class GapService extends bleno.PrimaryService {
         // GAP peripheral privacy
         new ValueReadCharacteristic('2A02', [0x00]),
         // GAP reconnect address
-        new ValueReadCharacteristic('2A03', '00:00:00:00:00:00'),
+        new ValueReadCharacteristic('2A03', [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
         // Peripheral preferred connection parameters
-        new ValueReadCharacteristic('2A04', [0x18, 0x00, 0x18, 0x00, 0x00, 0x00, 0xE8, 0x03])
+        new ValueReadCharacteristic('2A04', [0x00, 0x18, 0x00, 0x18, 0x00, 0x00, 0x03, 0xE8])
       ]
     })
   }
