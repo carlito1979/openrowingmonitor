@@ -11,9 +11,9 @@ import ValueReadCharacteristic from './characteristic/ValueReadCharacteristic.js
 
 export default class GapService extends bleno.PrimaryService {
   constructor () {
-    super({
+    super({ 
       // GAP Service UUID of PM5
-      uuid: getFullUUID('0000'),
+      uuid: getFullUUID('1800'),
       characteristics: [
         // GAP device name
         new ValueReadCharacteristic('2A00', constants.name),
