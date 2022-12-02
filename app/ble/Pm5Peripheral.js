@@ -91,8 +91,8 @@ function createPm5Peripheral (controlCallback, options) {
 
   // present current rowing metrics to C2-PM5 central
   function notifyData (type, data) {
-    log.debug(`ble notify data: ${type}`) // debug code
-    log.debug(`ble notify data: ${data}`) // debug code
+    //log.debug(`ble notify data: ${type}`) // debug code
+    //log.debug(`ble notify data: ${data}`) // debug code
     rowingService.notifyData(type, data)
   }
 
