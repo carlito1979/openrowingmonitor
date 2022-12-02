@@ -24,8 +24,8 @@ export default class ControlReceive extends bleno.Characteristic {
   // Central sends a command to the Control Point
   onWriteRequest (data, offset, withoutResponse, callback) {
     log.debug('ControlReceive command: ', data)
-    log.debug('ControlReceive offset: ', data)
-    log.debug('ControlReceive withoutResponse: ', data)
-    log.debug('ControlReceive callback: ', data)
+    log.debug('ControlReceive offset: ', offset)
+    log.debug('ControlReceive withoutResponse: ', withoutResponse)
+    log.debug('ControlReceive callback: ', callback)
   }
 }
