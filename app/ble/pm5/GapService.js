@@ -8,7 +8,7 @@
 import bleno from '@abandonware/bleno'
 import { constants, getFullUUID } from './Pm5Constants.js'
 import ValueReadCharacteristic from './characteristic/ValueReadCharacteristic.js'
-
+ 
 export default class GapService extends bleno.PrimaryService {
   constructor () {
     super({ 

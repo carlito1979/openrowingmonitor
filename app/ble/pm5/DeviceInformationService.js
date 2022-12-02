@@ -1,7 +1,7 @@
 'use strict'
 /*
   Open Rowing Monitor, https://github.com/laberning/openrowingmonitor
-
+ 
   Provides the required Device Information of the PM5
 */
 import bleno from '@abandonware/bleno'

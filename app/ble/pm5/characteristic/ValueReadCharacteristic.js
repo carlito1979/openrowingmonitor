@@ -18,7 +18,7 @@ export default class ValueReadCharacteristic extends bleno.Characteristic {
     this.uuid = uuid
     this._value = Buffer.isBuffer(value) ? value : Buffer.from(value)
     this._description = description
-    this._updateValueCallback = null
+    this._updateValueCallback = null 
   }
 
   onReadRequest (offset, callback) {
