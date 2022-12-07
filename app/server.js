@@ -175,7 +175,7 @@ rowingStatistics.on('rowingStopped', (metrics) => {
   webServer.notifyClients('metrics', metrics)
   peripheralManager.notifyMetrics('metricsUpdate', metrics)
   antServer.notifyMetrics('metricsUpdate', metrics)
-  workoutRecorder.writeRecordings() // metrics wasn't required?
+  workoutRecorder.writeRecordings()
 })
 
 if (config.heartrateMonitorBLE) {
