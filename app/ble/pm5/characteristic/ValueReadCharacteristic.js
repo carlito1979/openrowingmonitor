@@ -23,6 +23,7 @@ export default class ValueReadCharacteristic extends bleno.Characteristic {
 
   onReadRequest (offset, callback) {
     log.debug(`ValueReadRequest: ${this._description ? this._description : this.uuid} : ${this._value}`)
+    log.debug(this._value.slice(offset, this._value.length))
     callback(this.RESULT_SUCCESS, this._value.slice(offset, this._value.length))
   }
 
