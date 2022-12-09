@@ -20,19 +20,14 @@ export default class ControlReceive extends bleno.Characteristic {
     })
     this._updateValueCallback = null
   }
-
-  onSubscribe (maxValueSize, updateValueCallback) {
-    log.debug(`ControlReceive - central subscribed with maxSize: ${maxValueSize}`)
-    this._updateValueCallback = updateValueCallback
-    return this.RESULT_SUCCESS
-  }
-
+  
   // Central sends a command to the Control Point
   onWriteRequest (data, offset, withoutResponse, callback) {
+    log.debug('ControlReceive data lenght', data.length)
     log.debug('ControlReceive command: ', data)
     log.debug('ControlReceive offset: ', offset)
     log.debug('ControlReceive withoutResponse: ', withoutResponse)
     log.debug('ControlReceive callback: ', callback)
-    return this.RESULT_SUCCESS
+    callback(this.RESULT_SUCCESS)
   }
 }
