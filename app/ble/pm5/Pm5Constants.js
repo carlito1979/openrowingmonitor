@@ -13,7 +13,7 @@ const constants = {
   // please note: hardware versions exclude a software version, and thus might confuse the client
   firmwareRevision: '211',
   manufacturer: 'Concept2',
-  ergMachineType: [0x05] // Static E/RowErg
+  ergMachineType: 0x05 // Static E/RowErg
 }
 
 // PM5 uses 128bit UUIDs that are always prefixed and suffixed the same way
