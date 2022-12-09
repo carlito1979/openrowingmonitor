@@ -18,7 +18,7 @@ export default class GattService extends bleno.PrimaryService {
         // GATT service changed
         new ValueReadCharacteristic('2A05', null),
         // GATT client config
-        new ValueReadCharacteristic('2902', [0x00, 0x00])
+        new ValueReadCharacteristic('2902', [0x01, 0x00])
       ]
     })
   }

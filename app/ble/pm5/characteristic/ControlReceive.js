@@ -16,7 +16,7 @@ export default class ControlReceive extends bleno.Characteristic {
       // id for ControlReceive as defined in the spec
       uuid: getFullUUID('0021'),
       value: null,
-      properties: ['write']
+      properties: ['writeRequest', 'readRequest'] 
     })
     this._updateValueCallback = null
   }
@@ -33,5 +33,6 @@ export default class ControlReceive extends bleno.Characteristic {
     log.debug('ControlReceive offset: ', offset)
     log.debug('ControlReceive withoutResponse: ', withoutResponse)
     log.debug('ControlReceive callback: ', callback)
+    return this.RESULT_SUCCESS
   }
 }
