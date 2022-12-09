@@ -16,11 +16,16 @@ export default class ControlReceive extends bleno.Characteristic {
       // id for ControlReceive as defined in the spec
       uuid: getFullUUID('0021'),
       value: null,
-      properties: ['writeRequest', 'readRequest'] 
+      properties: ['write', 'read'] 
     })
     this._updateValueCallback = null
   }
-  
+
+  onReadRequest (offset, callback) {
+    log.debug('ControlReceive Read Request')
+    callback(this.RESULT_SUCCESS, this._updateValueCallback)
+  }
+
   // Central sends a command to the Control Point
   onWriteRequest (data, offset, withoutResponse, callback) {
     log.debug('ControlReceive data lenght', data.length)
