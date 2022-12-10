@@ -9,7 +9,6 @@
 import bleno from '@abandonware/bleno'
 import { getFullUUID } from '../Pm5Constants.js'
 import log from 'loglevel'
-import BufferBuilder from '../../BufferBuilder.js'
 
 export default class ControlTransmit extends bleno.Characteristic {
   constructor () {
@@ -35,10 +34,11 @@ export default class ControlTransmit extends bleno.Characteristic {
   }
 
   notify (data) {
+    log.debug('_updateValueCallback: ', this._updateValueCallback) // debug code
     if (this._updateValueCallback) {
-      const bufferBuilder = Buffer.concat(data)
-      log.debug('ControlTransmit - message send: ', bufferBuilder)
-      this._updateValueCallback(bufferBuilder)
+      const buffer = Buffer.from(data)
+      log.debug('ControlTransmit - message send: ', buffer) // debug code
+      this._updateValueCallback(buffer)
       return this.RESULT_SUCCESS
     }
   }
