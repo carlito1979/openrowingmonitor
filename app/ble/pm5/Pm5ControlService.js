@@ -26,5 +26,9 @@ export default class PM5ControlService extends bleno.PrimaryService {
 
   }
 
+  response (messageArray) {
+    this.controlTransmit.notify(messageArray)
+  }
+
   
 }

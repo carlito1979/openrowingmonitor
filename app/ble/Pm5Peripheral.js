@@ -25,7 +25,7 @@ function createPm5Peripheral (controlCallback, options) {
  
   crEvent.on('terminate', (data) => {
     log.debug('CS terminate command: ', data) // debug code
-    
+    controlService.response(data)
   })
 
   bleno.on('stateChange', (state) => {
