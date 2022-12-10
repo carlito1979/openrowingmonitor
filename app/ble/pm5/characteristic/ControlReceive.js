@@ -33,6 +33,11 @@ export default class ControlReceive extends bleno.Characteristic {
     log.debug('ControlReceive offset: ', offset)
     log.debug('ControlReceive withoutResponse: ', withoutResponse)
     log.debug('ControlReceive callback: ', callback)
+    // we'll be able to use this to start building a command buffer
+    log.debug('CR: ', data.toString('Hex'))
+    log.debug('Last Byte: ', data[data.length-1])
+
+
     callback(this.RESULT_SUCCESS)
   }
 }
