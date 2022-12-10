@@ -47,8 +47,8 @@ export default class ControlReceive extends bleno.Characteristic {
     const lastByte = data[data.length-1]
     if (firstByte == 0xF1) { // This flags the start of the command
       this._bufferArray = [] // reset array
-    } 
-    if (lastByte == 0xF2) { // this flags the end of the command
+      this._bufferArray.push(data)
+    } else if (lastByte == 0xF2) { // this flags the end of the command
       this._bufferArray.push(data)
       const buffer = Buffer.concat(this._bufferArray)
       bufferString = buffer.toString('Hex')
