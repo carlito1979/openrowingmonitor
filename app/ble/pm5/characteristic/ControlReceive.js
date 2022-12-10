@@ -9,9 +9,11 @@
 import bleno from '@abandonware/bleno'
 import { getFullUUID } from '../Pm5Constants.js'
 import log from 'loglevel'
-//import EventEmitter from 'node:events'
+import EventEmitter from 'node:events'
 
-export default class ControlReceive extends bleno.Characteristic {
+export const crEvent = new EventEmitter()
+
+export class ControlReceive extends bleno.Characteristic {
   constructor () {
     super({
       // id for ControlReceive as defined in the spec
@@ -62,7 +64,7 @@ export default class ControlReceive extends bleno.Characteristic {
     if (lastByte == 0xF2) {
       if (bufferString == 'f176041302010260f2') { // this is the terminate workout command
         // we want to respond with the following command
-        //this._emitter.emit('terminate', [0xF1, 0x81, 0x76, 0x01, 0x13, 0xE5, 0xF2])
+        crEvent.emit('terminate', [0xF1, 0x81, 0x76, 0x01, 0x13, 0xE5, 0xF2])
       }
 
     }

@@ -14,6 +14,7 @@ import GapService from './pm5/GapService.js'
 import log from 'loglevel'
 import Pm5ControlService from './pm5/Pm5ControlService.js'
 import Pm5RowingService from './pm5/Pm5RowingService.js'
+import { crEvent } from './pm5/characteristic/ControlReceive.js'
 
 function createPm5Peripheral (controlCallback, options) {
   const peripheralName = constants.name
@@ -22,9 +23,9 @@ function createPm5Peripheral (controlCallback, options) {
   const controlService = new Pm5ControlService()
   const rowingService = new Pm5RowingService()
  
-  //controlService.on('terminate', (data) => {
- //   log.debug('CS termindate command: ', data)
-  //})
+  crEvent.on('terminate', (data) => {
+    log.debug('CS termindate command: ', data)
+  })
 
   bleno.on('stateChange', (state) => {
     log.debug(`ble statechange: ${state}`) // debug code
