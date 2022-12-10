@@ -36,14 +36,14 @@ export class ControlReceive extends bleno.Characteristic {
   // Central sends a command to the Control Point
   onWriteRequest (data, offset, withoutResponse, callback) {
     let bufferString = ""
-    log.debug('ControlReceive data length', data.length)
-    log.debug('ControlReceive command: ', data)
+    //log.debug('ControlReceive data length', data.length)
+    //log.debug('ControlReceive command: ', data)
     //log.debug('ControlReceive offset: ', offset)
     //log.debug('ControlReceive withoutResponse: ', withoutResponse)
     //log.debug('ControlReceive callback: ', callback)
     // we'll be able to use this to start building a command buffer
-    log.debug('First Byte: ', data[0].toString(16))
-    log.debug('Last Byte: ', data[data.length-1].toString(16))
+    //log.debug('First Byte: ', data[0].toString(16))
+    //log.debug('Last Byte: ', data[data.length-1].toString(16))
     const firstByte = data[0]
     const lastByte = data[data.length-1]
     if (firstByte == 0xF1) { // This flags the start of the command

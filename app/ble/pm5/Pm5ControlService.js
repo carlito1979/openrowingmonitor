@@ -12,13 +12,17 @@ import { ControlReceive } from './characteristic/ControlReceive.js'
 
 export default class PM5ControlService extends bleno.PrimaryService {
   constructor () {
+    const controlReceive = new ControlReceive()
+    const controlTransmit = new ControlTransmit() 
     super({
       uuid: getFullUUID('0020'),
       characteristics: [ 
-        new ControlReceive(),
-        new ControlTransmit()
+        controlReceive,
+        controlTransmit
       ]
     })
+    this.controlReceive = controlReceive
+    this.controlTransmit = controlTransmit
 
   }
 
