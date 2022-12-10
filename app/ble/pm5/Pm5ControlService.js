@@ -9,15 +9,22 @@ import bleno from '@abandonware/bleno'
 import { getFullUUID } from './Pm5Constants.js'
 import ControlTransmit from './characteristic/ControlTransmit.js'
 import ControlReceive from './characteristic/ControlReceive.js'
+import EventEmitter from 'node:events'
 
 export default class PM5ControlService extends bleno.PrimaryService {
   constructor () {
     super({
       uuid: getFullUUID('0020'),
-      characteristics: [
+      characteristics: [ 
         new ControlReceive(),
         new ControlTransmit()
       ]
     })
+    this._emitter = new EventEmitter()
+    return Object.assign(this._emitter, {
+    })
+
   }
+
+  
 }

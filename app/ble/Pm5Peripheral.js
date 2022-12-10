@@ -26,7 +26,6 @@ function createPm5Peripheral (controlCallback, options) {
     log.debug('CS termindate command: ', data)
   })
 
-
   bleno.on('stateChange', (state) => {
     log.debug(`ble statechange: ${state}`) // debug code
     triggerAdvertising(state)
