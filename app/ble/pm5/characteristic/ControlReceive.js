@@ -47,6 +47,7 @@ export default class ControlReceive extends bleno.Characteristic {
       const buffer = Buffer.concat(this._bufferArray)
       log.debug('Full Command: ', buffer)
       log.debug('String Command: ', buffer.toString('Hex'))
+      log.debug('String Value: ', Buffer.from(buffer))
       this._bufferArray = []
     } else {
       this._bufferArray.push(data)
