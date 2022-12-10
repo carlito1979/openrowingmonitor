@@ -9,6 +9,8 @@
 import bleno from '@abandonware/bleno'
 import { getFullUUID } from '../Pm5Constants.js'
 import log from 'loglevel'
+import BufferBuilder from '../../BufferBuilder.js'
+import EventEmitter from 'node:events'
 
 export default class ControlReceive extends bleno.Characteristic {
   constructor () {
@@ -20,6 +22,9 @@ export default class ControlReceive extends bleno.Characteristic {
     })
     this._updateValueCallback = null
     this._bufferArray = []
+    this._emitter = new EventEmitter()
+    return Object.assign(this._emitter, {
+    })
   }
 
   onReadRequest (offset, callback) {
@@ -29,6 +34,7 @@ export default class ControlReceive extends bleno.Characteristic {
 
   // Central sends a command to the Control Point
   onWriteRequest (data, offset, withoutResponse, callback) {
+    let bufferString = ""
     log.debug('ControlReceive data length', data.length)
     log.debug('ControlReceive command: ', data)
     //log.debug('ControlReceive offset: ', offset)
@@ -45,14 +51,23 @@ export default class ControlReceive extends bleno.Characteristic {
     if (lastByte == 0xF2) { // this flags the end of the command
       this._bufferArray.push(data)
       const buffer = Buffer.concat(this._bufferArray)
+      bufferString = buffer.toString('Hex')
       log.debug('Full Command: ', buffer)
-      log.debug('String Command: ', buffer.toString('Hex'))
-      log.debug('String Value: ', Buffer.from(buffer))
       this._bufferArray = []
     } else {
       this._bufferArray.push(data)
     }
 
     callback(this.RESULT_SUCCESS)
+
+    if (lastByte == 0xF2) {
+      if (bufferString == 'f176041302010260f2') { // this is the terminate workout command
+        // we want to respond with the following command
+        this._emitter.emit('terminate', [0xF1, 0x81, 0x76, 0x01, 0x13, 0xE5, 0xF2])
+      }
+
+    }
+
   }
+
 }
