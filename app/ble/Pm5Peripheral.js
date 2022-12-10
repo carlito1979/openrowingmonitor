@@ -22,9 +22,9 @@ function createPm5Peripheral (controlCallback, options) {
   const controlService = new Pm5ControlService()
   const rowingService = new Pm5RowingService()
  
-  controlService.on('terminate', (data) => {
-    log.debug('CS termindate command: ', data)
-  })
+  //controlService.on('terminate', (data) => {
+ //   log.debug('CS termindate command: ', data)
+  //})
 
   bleno.on('stateChange', (state) => {
     log.debug(`ble statechange: ${state}`) // debug code

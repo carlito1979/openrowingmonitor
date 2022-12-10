@@ -9,8 +9,7 @@
 import bleno from '@abandonware/bleno'
 import { getFullUUID } from '../Pm5Constants.js'
 import log from 'loglevel'
-import BufferBuilder from '../../BufferBuilder.js'
-import EventEmitter from 'node:events'
+//import EventEmitter from 'node:events'
 
 export default class ControlReceive extends bleno.Characteristic {
   constructor () {
@@ -22,9 +21,9 @@ export default class ControlReceive extends bleno.Characteristic {
     })
     this._updateValueCallback = null
     this._bufferArray = []
-    this._emitter = new EventEmitter()
-    return Object.assign(this._emitter, {
-    })
+    //this._emitter = new EventEmitter()
+    //return Object.assign(this._emitter, {
+    //})
   }
 
   onReadRequest (offset, callback) {
@@ -63,7 +62,7 @@ export default class ControlReceive extends bleno.Characteristic {
     if (lastByte == 0xF2) {
       if (bufferString == 'f176041302010260f2') { // this is the terminate workout command
         // we want to respond with the following command
-        this._emitter.emit('terminate', [0xF1, 0x81, 0x76, 0x01, 0x13, 0xE5, 0xF2])
+        //this._emitter.emit('terminate', [0xF1, 0x81, 0x76, 0x01, 0x13, 0xE5, 0xF2])
       }
 
     }
