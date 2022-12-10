@@ -5,9 +5,9 @@
   Some PM5 specific constants
 */
 const constants = {
-  serial: '430848087',
+  serial: '433456789',
   model: 'PM5',
-  name: 'PM5 430848087',
+  name: 'PM5 433456789 Row',
   hardwareRevision: '907',
   // See https://www.concept2.com/service/monitors/pm5/firmware for available versions
   // please note: hardware versions exclude a software version, and thus might confuse the client
