@@ -31,9 +31,9 @@ export default class ControlReceive extends bleno.Characteristic {
   onWriteRequest (data, offset, withoutResponse, callback) {
     log.debug('ControlReceive data length', data.length)
     log.debug('ControlReceive command: ', data)
-    log.debug('ControlReceive offset: ', offset)
-    log.debug('ControlReceive withoutResponse: ', withoutResponse)
-    log.debug('ControlReceive callback: ', callback)
+    //log.debug('ControlReceive offset: ', offset)
+    //log.debug('ControlReceive withoutResponse: ', withoutResponse)
+    //log.debug('ControlReceive callback: ', callback)
     // we'll be able to use this to start building a command buffer
     log.debug('First Byte: ', data[0].toString(16))
     log.debug('Last Byte: ', data[data.length-1].toString(16))
@@ -44,7 +44,9 @@ export default class ControlReceive extends bleno.Characteristic {
       this._bufferArray.push(data)
     } else if (lastByte == 0xF2) { // this flags the end of the command
       this._bufferArray.push(data)
-      log.debug('Full Command: ', Buffer.concat(this._bufferArray))
+      const buffer = Buffer.concat(this._bufferArray)
+      log.debug('Full Command: ', buffer)
+      log.debug('String Command: ', buffer.toString('Hex'))
       this._bufferArray = []
     } else {
       this._bufferArray.push(data)
