@@ -9,7 +9,7 @@ import bleno from '@abandonware/bleno'
 import { getFullUUID } from './Pm5Constants.js'
 import ControlTransmit from './characteristic/ControlTransmit.js'
 import { ControlReceive } from './characteristic/ControlReceive.js'
-import log from 'loglevel'
+//import log from 'loglevel'
 
 export default class PM5ControlService extends bleno.PrimaryService {
   constructor () {
@@ -28,7 +28,7 @@ export default class PM5ControlService extends bleno.PrimaryService {
   }
 
   response (messageArray) {
-    log.debug('Response: ', messageArray) // debug code
+    //log.debug('Response: ', messageArray) // debug code
     this.controlTransmit.notify(messageArray)
   }
 

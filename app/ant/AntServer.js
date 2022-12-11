@@ -282,11 +282,13 @@ export class AntServer {
           0xFF, // heart rate not being sent
           ...Ant.Messages.intToLEHexArray((this.capabilitiesState +PAGE_16_FLAGS), 1)
         ]
+        /*
         if (this.sessionStatus === 'Rowing') {
-          log.debug(`Page 16 Data Sent. Event=${this.eventCount}. Time=${this.accumulatedTime}. Distance=${this.accumulatedDistance}. Speed=${this.cycleLinearVelocity}.`)
+          log.debug(`Page 16 Data Sent. Event=${this.eventCount}. Time=${this.accumulatedTime}. Distance=${this.accumulatedDistance}. Speed=${this.cycleLinearVelocity}.`) // debug code
           hexString = Ant.Messages.intToLEHexArray(this.cycleLinearVelocity, 2)
-          log.debug(`Hex Time=0x${this.accumulatedTime.toString(16)}. Hex Distance=0x${this.accumulatedDistance.toString(16)}. Hex Speed=0x${hexString}.`)
+          log.debug(`Hex Time=0x${this.accumulatedTime.toString(16)}. Hex Distance=0x${this.accumulatedDistance.toString(16)}. Hex Speed=0x${hexString}.`) // debug code
         }
+        */
         break
       case 17: // 0x11 - General Settings Page (once a second)
         data = [
@@ -299,10 +301,12 @@ export class AntServer {
           ...Ant.Messages.intToLEHexArray(this.dragFactor, 1),// Drag Factor Interpreted as Resistance. DF 50 = 0%, DF 250 = 100% (e.g., DF 130 = 40% resistance) each unit = 0.5%
           ...Ant.Messages.intToLEHexArray(this.capabilitiesState, 1)
         ]
+        /*
         if (this.sessionStatus === 'Rowing') {
-          log.debug(`Page 17 Data Sent. Event=${this.eventCount}. Stroke Length=${this.driveLength}. Drag Factor=${this.dragFactor}.`)
-          log.debug(`Hex Stroke Length=0x${this.driveLength.toString(16)}. Hex Drag Factor=0x${this.dragFactor.toString(16)}.`)
+          log.debug(`Page 17 Data Sent. Event=${this.eventCount}. Stroke Length=${this.driveLength}. Drag Factor=${this.dragFactor}.`) // debug code
+          log.debug(`Hex Stroke Length=0x${this.driveLength.toString(16)}. Hex Drag Factor=0x${this.dragFactor.toString(16)}.`) // debug code
         }
+        */
         break
       case 22: // 0x16 - Specific Rower Data (once a second)
         data = [
@@ -315,11 +319,13 @@ export class AntServer {
           ...Ant.Messages.intToLEHexArray(this.cyclePower, 2), // Instant Power (2 bytes)
           ...Ant.Messages.intToLEHexArray((this.capabilitiesState +PAGE_22_FLAGS), 1)
         ]
+        /*
         if (this.sessionStatus === 'Rowing') {
-          log.debug(`Page 22 Data Sent. Event=${this.eventCount}. Strokes=${this.accumulatedStrokes}. Stroke Rate=${this.cycleStrokeRate}. Power=${this.cyclePower}`)
+          log.debug(`Page 22 Data Sent. Event=${this.eventCount}. Strokes=${this.accumulatedStrokes}. Stroke Rate=${this.cycleStrokeRate}. Power=${this.cyclePower}`) // debug code
           hexString = Ant.Messages.intToLEHexArray(this.cyclePower, 2)
-          log.debug(`Hex Strokes=0x${this.accumulatedStrokes.toString(16)}. Hex Stroke Rate=0x${this.cycleStrokeRate.toString(16)}. Hex Power=0x${hexString}. Lap Bit=0x${lapBit.toString(2)}`)
+          log.debug(`Hex Strokes=0x${this.accumulatedStrokes.toString(16)}. Hex Stroke Rate=0x${this.cycleStrokeRate.toString(16)}. Hex Power=0x${hexString}. Lap Bit=0x${lapBit.toString(2)}`) // debug code
         }
+        */
         break
       case 80: // 0x50 - Common Page for Manufacturers Identification (approx twice a minute)
         data = [

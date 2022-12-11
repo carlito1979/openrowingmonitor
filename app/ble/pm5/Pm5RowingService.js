@@ -77,6 +77,8 @@ export default class PM5RowingService extends bleno.PrimaryService {
 
   notifyData (type, data) {
     if (type === 'strokeFinished' || type === 'metricsUpdate') {
+      log.debug('PM5 Notify RS type: ', type) // debug code
+      log.debug('PM5 Notidy RS data: ', data) // debug code
       this.generalStatus.notify(data)
       this.additionalStatus.notify(data)
       this.additionalStatus2.notify(data)

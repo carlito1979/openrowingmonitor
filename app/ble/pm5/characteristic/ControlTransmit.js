@@ -34,7 +34,7 @@ export default class ControlTransmit extends bleno.Characteristic {
   }
 
   notify (data) {
-    log.debug('_updateValueCallback: ', this._updateValueCallback) // debug code
+    //log.debug('_updateValueCallback: ', this._updateValueCallback) // debug code
     if (this._updateValueCallback) {
       const buffer = Buffer.from(data)
       log.debug('ControlTransmit - message send: ', buffer) // debug code
