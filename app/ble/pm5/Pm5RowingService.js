@@ -27,6 +27,7 @@ import AdditionalStatus from './characteristic/AdditionalStatus.js'
 import AdditionalStatus2 from './characteristic/AdditionalStatus2.js'
 import AdditionalStrokeData from './characteristic/AdditionalStrokeData.js'
 import StrokeData from './characteristic/StrokeData.js'
+import log from 'loglevel'
 
 export default class PM5RowingService extends bleno.PrimaryService {
   constructor () {
