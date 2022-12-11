@@ -8,29 +8,16 @@
 import bleno from '@abandonware/bleno'
 import { getFullUUID } from './Pm5Constants.js'
 import ControlTransmit from './characteristic/ControlTransmit.js'
-import { ControlReceive } from './characteristic/ControlReceive.js'
-//import log from 'loglevel'
+import ControlReceive from './characteristic/ControlReceive.js'
 
 export default class PM5ControlService extends bleno.PrimaryService {
   constructor () {
-    const controlReceive = new ControlReceive()
-    const controlTransmit = new ControlTransmit() 
     super({
       uuid: getFullUUID('0020'),
-      characteristics: [ 
-        controlReceive,
-        controlTransmit
+      characteristics: [
+        new ControlReceive(),
+        new ControlTransmit()
       ]
     })
-    this.controlReceive = controlReceive
-    this.controlTransmit = controlTransmit
-
   }
-
-  response (messageArray) {
-    //log.debug('Response: ', messageArray) // debug code
-    this.controlTransmit.notify(messageArray)
-  }
-
-  
 }

@@ -10,7 +10,7 @@
   characteristic will indicate which data characteristic is multiplexed."
 */
 import bleno from '@abandonware/bleno'
-import { getFullUUID } from '../Pm5Constants.js'
+import { getFullUUID } from '../Pm5ConstantsProprietary.js'
 import log from 'loglevel'
 
 export default class MultiplexedCharacteristic extends bleno.Characteristic {

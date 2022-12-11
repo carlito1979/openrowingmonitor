@@ -6,8 +6,8 @@
   todo: not sure if this is correct, the normal GAP service has 0x1800
 */
 import bleno from '@abandonware/bleno'
-import { constants, getFullUUID } from './Pm5Constants.js'
-import ValueReadCharacteristic from './characteristic/ValueReadCharacteristic.js'
+import { constants, getFullUUID } from './Pm5ConstantsProprietary.js'
+import ValueReadCharacteristic from './characteristic/ValueReadCharacteristicProprietary.js'
 
 export default class GattService extends bleno.PrimaryService {
   constructor () {

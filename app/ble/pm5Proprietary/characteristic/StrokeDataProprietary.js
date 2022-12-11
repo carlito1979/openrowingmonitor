@@ -7,7 +7,7 @@
   todo: we could calculate all the missing stroke metrics in the RowerEngine
 */
 import bleno from '@abandonware/bleno'
-import { getFullUUID } from '../Pm5Constants.js'
+import { getFullUUID } from '../Pm5ConstantsProprietary.js'
 import log from 'loglevel'
 import BufferBuilder from '../../BufferBuilder.js'
 

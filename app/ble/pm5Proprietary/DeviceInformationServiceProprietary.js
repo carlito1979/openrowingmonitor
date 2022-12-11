@@ -1,12 +1,12 @@
 'use strict'
 /*
   Open Rowing Monitor, https://github.com/laberning/openrowingmonitor
-
+ 
   Provides the required Device Information of the PM5
 */
 import bleno from '@abandonware/bleno'
-import { constants, getFullUUID } from './Pm5Constants.js'
-import ValueReadCharacteristic from './characteristic/ValueReadCharacteristic.js'
+import { constants, getFullUUID } from './Pm5ConstantsProprietary.js'
+import ValueReadCharacteristic from './characteristic/ValueReadCharacteristicProprietary.js'
 
 export default class DeviceInformationService extends bleno.PrimaryService {
   constructor () {

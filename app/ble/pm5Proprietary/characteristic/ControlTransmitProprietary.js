@@ -7,9 +7,8 @@
   Used to transmit controls to the central
 */
 import bleno from '@abandonware/bleno'
-import { getFullUUID } from '../Pm5Constants.js'
+import { getFullUUID } from '../Pm5ConstantsProprietary.js'
 import log from 'loglevel'
-import BufferBuilder from '../../BufferBuilder.js'
 
 export default class ControlTransmit extends bleno.Characteristic {
   constructor () {
@@ -35,9 +34,11 @@ export default class ControlTransmit extends bleno.Characteristic {
   }
 
   notify (data) {
+    //log.debug('_updateValueCallback: ', this._updateValueCallback) // debug code
     if (this._updateValueCallback) {
-      const bufferBuilder = new BufferBuilder()
-      this._updateValueCallback(bufferBuilder.getBuffer())
+      const buffer = Buffer.from(data)
+      log.debug('ControlTransmit - message send: ', buffer) // debug code
+      this._updateValueCallback(buffer)
       return this.RESULT_SUCCESS
     }
   }

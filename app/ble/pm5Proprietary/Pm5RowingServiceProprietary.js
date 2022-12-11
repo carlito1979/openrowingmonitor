@@ -19,14 +19,15 @@
   * and of course the multiplexer
 */
 import bleno from '@abandonware/bleno'
-import { getFullUUID } from './Pm5Constants.js'
-import ValueReadCharacteristic from './characteristic/ValueReadCharacteristic.js'
-import MultiplexedCharacteristic from './characteristic/MultiplexedCharacteristic.js'
-import GeneralStatus from './characteristic/GeneralStatus.js'
-import AdditionalStatus from './characteristic/AdditionalStatus.js'
-import AdditionalStatus2 from './characteristic/AdditionalStatus2.js'
-import AdditionalStrokeData from './characteristic/AdditionalStrokeData.js'
-import StrokeData from './characteristic/StrokeData.js'
+import { getFullUUID } from './Pm5ConstantsProprietary.js'
+import ValueReadCharacteristic from './characteristic/ValueReadCharacteristicProprietary.js'
+import MultiplexedCharacteristic from './characteristic/MultiplexedCharacteristicProprietary.js'
+import GeneralStatus from './characteristic/GeneralStatusProprietary.js'
+import AdditionalStatus from './characteristic/AdditionalStatusProprietary.js'
+import AdditionalStatus2 from './characteristic/AdditionalStatus2Proprietary.js'
+import AdditionalStrokeData from './characteristic/AdditionalStrokeDataProprietary.js'
+import StrokeData from './characteristic/StrokeDataProprietary.js'
+import log from 'loglevel'
 
 export default class PM5RowingService extends bleno.PrimaryService {
   constructor () {
@@ -86,5 +87,14 @@ export default class PM5RowingService extends bleno.PrimaryService {
       // the stroke state is delivered via the GeneralStatus Characteristic, so we only need to notify that one
       this.generalStatus.notify(data)
     }
+
+    if (type ==='strokeFinished' || type === 'strokeStateChange')  {
+      
+      log.debug('PM5 Notify RS type: ', type) // debug code
+      log.debug('PM5 Notify RS data: ', data) // debug code
+      
+    }
+
+
   }
 }

@@ -114,6 +114,8 @@ export class DashboardActions extends AppElement {
     const value = this.appState?.config?.peripheralMode
     if (value === 'PM5') {
       return 'C2 PM5'
+    } else if (value == 'PMP') {
+      return 'PM5 Prop'
     } else if (value === 'FTMSBIKE') {
       return 'FTMS Bike'
     } else if (value === 'FTMS') {

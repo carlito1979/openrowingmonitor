@@ -8,10 +8,11 @@
 import config from '../tools/ConfigManager.js'
 import { createFtmsPeripheral } from './FtmsPeripheral.js'
 import { createPm5Peripheral } from './Pm5Peripheral.js'
+import { createPm5PeripheralProprietary } from './Pm5PeripheralProprietary.js'
 import log from 'loglevel'
 import EventEmitter from 'node:events'
 
-const modes = ['FTMS', 'FTMSBIKE', 'PM5']
+const modes = ['FTMS', 'FTMSBIKE', 'PM5', 'PMP']
 function createPeripheralManager () {
   const emitter = new EventEmitter()
   let peripheral
@@ -52,6 +53,10 @@ function createPeripheralManager () {
       log.info('bluetooth profile: Concept2 PM5')
       peripheral = createPm5Peripheral(controlCallback)
       mode = 'PM5'
+    } else if (newMode === 'PMP') {
+      log.info('bluetooth profile: Concept2 PM5 Proprietary')
+      peripheral = createPm5PeripheralProprietary(controlCallback)
+      mode = 'PMP'
     } else if (newMode === 'FTMSBIKE') {
       log.info('bluetooth profile: FTMS Indoor Bike')
       peripheral = createFtmsPeripheral(controlCallback, {

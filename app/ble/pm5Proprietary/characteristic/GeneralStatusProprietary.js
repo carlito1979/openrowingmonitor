@@ -6,7 +6,7 @@
   https://www.concept2.co.uk/files/pdf/us/monitors/PM5_BluetoothSmartInterfaceDefinition.pdf
 */
 import bleno from '@abandonware/bleno'
-import { getFullUUID } from '../Pm5Constants.js'
+import { getFullUUID } from '../Pm5ConstantsProprietary.js'
 import log from 'loglevel'
 import BufferBuilder from '../../BufferBuilder.js'
 

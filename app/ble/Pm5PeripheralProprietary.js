@@ -1,35 +1,48 @@
 'use strict'
-/*
+/* 
   Open Rowing Monitor, https://github.com/laberning/openrowingmonitor
 
   Creates a Bluetooth Low Energy (BLE) Peripheral with all the Services that are used by the
   Concept2 PM5 rowing machine.
 
   see: https://www.concept2.co.uk/files/pdf/us/monitors/PM5_BluetoothSmartInterfaceDefinition.pdf
+
+  This version of the PM5 Peripheral is intended to communicate via Concept2 proprietary commands 
+
 */
 import bleno from '@abandonware/bleno'
-import { constants } from './pm5/Pm5Constants.js'
-import DeviceInformationService from './pm5/DeviceInformationService.js'
-import GapService from './pm5/GapService.js'
+import { constants } from './pm5Proprietary/Pm5ConstantsProprietary.js'
+import DeviceInformationService from './pm5Proprietary/DeviceInformationServiceProprietary.js'
+import GapService from './pm5Proprietary/GapServiceProprietary.js'
+import GattService from './pm5Proprietary/GattServiceProprietary.js'
 import log from 'loglevel'
-import Pm5ControlService from './pm5/Pm5ControlService.js'
-import Pm5RowingService from './pm5/Pm5RowingService.js'
+import Pm5ControlService from './pm5Proprietary/Pm5ControlServiceProprietary.js'
+import Pm5RowingService from './pm5Proprietary/Pm5RowingServiceProprietary.js'
+import { crEvent } from './pm5Proprietary/characteristic/ControlReceiveProprietary.js'
 
-function createPm5Peripheral (controlCallback, options) {
+function createPm5PeripheralProprietary (controlCallback, options) {
   const peripheralName = constants.name
   const deviceInformationService = new DeviceInformationService()
   const gapService = new GapService()
+  const gattService = new GattService()
   const controlService = new Pm5ControlService()
   const rowingService = new Pm5RowingService()
+ 
+  crEvent.on('terminate', (data) => {
+    //log.debug('CS terminate command: ', data) // debug code
+    controlService.response(data)
+  })
 
   bleno.on('stateChange', (state) => {
+    log.debug(`ble statechange: ${state}`) // debug code
     triggerAdvertising(state)
   })
 
   bleno.on('advertisingStart', (error) => {
     if (!error) {
+      log.debug(`ble advertising start`) // debug code
       bleno.setServices(
-        [gapService, deviceInformationService, controlService, rowingService],
+        [gapService, gattService, deviceInformationService, controlService, rowingService],
         (error) => {
           if (error) log.error(error)
         })
@@ -89,11 +102,14 @@ function createPm5Peripheral (controlCallback, options) {
 
   // present current rowing metrics to C2-PM5 central
   function notifyData (type, data) {
+    //log.debug(`ble notify data: ${type}`) // debug code
+    //log.debug(`ble notify data: ${data}`) // debug code
     rowingService.notifyData(type, data)
   }
 
   // present current rowing status to C2-PM5 central
   function notifyStatus (status) {
+    log.debug(`ble notify status: ${status}`) // debug code
   }
 
   return {
@@ -104,4 +120,4 @@ function createPm5Peripheral (controlCallback, options) {
   }
 }
 
-export { createPm5Peripheral }
+export { createPm5PeripheralProprietary }

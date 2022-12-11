@@ -6,14 +6,14 @@
   todo: not sure if this is correct, the normal GAP service has 0x1800
 */
 import bleno from '@abandonware/bleno'
-import { constants, getFullUUID } from './Pm5Constants.js'
-import ValueReadCharacteristic from './characteristic/ValueReadCharacteristic.js'
-
+import { constants, getFullUUID } from './Pm5ConstantsProprietary.js'
+import ValueReadCharacteristic from './characteristic/ValueReadCharacteristicProprietary.js'
+ 
 export default class GapService extends bleno.PrimaryService {
   constructor () {
-    super({
+    super({ 
       // GAP Service UUID of PM5
-      uuid: getFullUUID('0000'),
+      uuid: getFullUUID('1800'),
       characteristics: [
         // GAP device name
         new ValueReadCharacteristic('2A00', constants.name),
@@ -22,9 +22,9 @@ export default class GapService extends bleno.PrimaryService {
         // GAP peripheral privacy
         new ValueReadCharacteristic('2A02', [0x00]),
         // GAP reconnect address
-        new ValueReadCharacteristic('2A03', '00:00:00:00:00:00'),
+        new ValueReadCharacteristic('2A03', [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
         // Peripheral preferred connection parameters
-        new ValueReadCharacteristic('2A04', [0x18, 0x00, 0x18, 0x00, 0x00, 0x00, 0xE8, 0x03])
+        new ValueReadCharacteristic('2A04', [0x00, 0x18, 0x00, 0x18, 0x00, 0x00, 0x03, 0xE8])
       ]
     })
   }
