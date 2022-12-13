@@ -28,8 +28,8 @@ function createPm5PeripheralProprietary (controlCallback, options) {
   const controlService = new Pm5ControlService()
   const rowingService = new Pm5RowingService()
  
-  crEvent.on('terminate', (data) => {
-    //log.debug('CS terminate command: ', data) // debug code
+  crEvent.on('respond', (data) => {
+    // event emitter to send a response back to the master peripheral
     controlService.response(data)
   })
 
@@ -102,9 +102,7 @@ function createPm5PeripheralProprietary (controlCallback, options) {
 
   // present current rowing metrics to C2-PM5 central
   function notifyData (type, data) {
-    //log.debug(`ble notify data: ${type}`) // debug code
-    //log.debug(`ble notify data: ${data}`) // debug code
-    rowingService.notifyData(type, data)
+    //rowingService.notifyData(type, data)
   }
 
   // present current rowing status to C2-PM5 central

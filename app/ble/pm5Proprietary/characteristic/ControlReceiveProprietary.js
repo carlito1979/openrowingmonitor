@@ -12,6 +12,7 @@ import log from 'loglevel'
 import EventEmitter from 'node:events'
 
 export const crEvent = new EventEmitter()
+const FLIP_BIT = 0x80
 
 export class ControlReceive extends bleno.Characteristic {
   constructor () {
@@ -23,9 +24,7 @@ export class ControlReceive extends bleno.Characteristic {
     })
     this._updateValueCallback = null
     this._bufferArray = []
-    //this._emitter = new EventEmitter()
-    //return Object.assign(this._emitter, {
-    //})
+    this._flip_bit = 0x81
   }
 
   onReadRequest (offset, callback) {
@@ -53,7 +52,8 @@ export class ControlReceive extends bleno.Characteristic {
       this._bufferArray.push(data)
       const buffer = Buffer.concat(this._bufferArray)
       bufferString = buffer.toString('Hex')
-      log.debug('Full Command: ', buffer)
+      log.debug('Full Command: ', buffer) // debug code
+      log.debug('Buffer String: ',bufferString) // debug code
       this._bufferArray = []
     } else {
       this._bufferArray.push(data)
@@ -62,13 +62,58 @@ export class ControlReceive extends bleno.Characteristic {
     callback(this.RESULT_SUCCESS)
 
     if (lastByte == 0xF2) {
+      // it's possible that we should handle this work in either a separate function, or in the ControlTransmit code
+      let bufferArray = []
       if (bufferString == 'f176041302010260f2') { // this is the terminate workout command
         // we want to respond with the following command
-        crEvent.emit('terminate', [0xF1, 0x81, 0x76, 0x01, 0x13, 0xE5, 0xF2])
+        // flip response bit -- WE SHOULD MOVE THIS TO THE START OF THE IF STATEMENT AT SOME POINT
+        this._flip_bit ^= FLIP_BIT
+        bufferArray.push(this._flip_bit, 0x76, 0x01, 0x13)
+        bufferArray = addStartEndFlags(bufferArray.concat(calculateChecksum(bufferArray)))
+        log.debug('response buffer: ', bufferArray)
+        crEvent.emit('respond', bufferArray)
       }
 
     }
 
   }
 
+}
+
+/*
+  function to calculate the checksum for the response
+*/
+function calculateChecksum(bufferArray) {
+  var checksum = 0x0
+  bufferArray.forEach(element => {
+    checksum ^= element
+  })
+  return byteStuffing(checksum)
+}
+
+/*
+  function to calculate if a byte stuffer is required
+*/
+function byteStuffing(byte) {
+  switch(byte) {
+    case 0xF0:
+      return [0xF3, 0x00]
+    case 0xF1:
+      return [0xF3, 0x01]
+    case 0xF2:
+      return [0xF3, 0x02]
+    case 0xF3:
+      return [0xF3, 0x03]
+    default:
+      return [byte]
+  }
+}
+
+/*
+  function to add start and end flags to array
+*/
+function addStartEndFlags(bufferArray) {
+  bufferArray.unshift(0xF1)
+  bufferArray.push(0xF2)
+  return bufferArray
 }

@@ -16,7 +16,7 @@ export default class GattService extends bleno.PrimaryService {
       uuid: getFullUUID('1801'),
       characteristics: [
         // GATT service changed
-        new ValueReadCharacteristic('2A05', null),
+        new ValueReadCharacteristic('2A05', [null]),
         // GATT client config
         new ValueReadCharacteristic('2902', [0x01, 0x00])
       ]
