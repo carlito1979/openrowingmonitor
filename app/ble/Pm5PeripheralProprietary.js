@@ -102,7 +102,7 @@ function createPm5PeripheralProprietary (controlCallback, options) {
 
   // present current rowing metrics to C2-PM5 central
   function notifyData (type, data) {
-    //rowingService.notifyData(type, data)
+    rowingService.notifyData(type, data)
   }
 
   // present current rowing status to C2-PM5 central
