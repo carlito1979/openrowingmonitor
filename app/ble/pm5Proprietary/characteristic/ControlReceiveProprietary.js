@@ -24,7 +24,7 @@ export class ControlReceive extends bleno.Characteristic {
     })
     this._updateValueCallback = null
     this._bufferArray = []
-    this._flip_bit = 0x81
+    this._flip_bit = 0x01
   }
 
   onReadRequest (offset, callback) {
@@ -70,7 +70,13 @@ export class ControlReceive extends bleno.Characteristic {
         this._flip_bit ^= FLIP_BIT
         bufferArray.push(this._flip_bit, 0x76, 0x01, 0x13)
         bufferArray = addStartEndFlags(bufferArray.concat(calculateChecksum(bufferArray)))
-        log.debug('response buffer: ', bufferArray)
+        log.debug('response buffer: ', Buffer.from(bufferArray))
+        crEvent.emit('respond', bufferArray)
+      } else if (bufferString == 'f17618010103030580000000c80505800000006414010113020101c2f2') {
+        this._flip_bit ^= FLIP_BIT
+        bufferArray.push(this._flip_bit, 0x76, 0x5, 0x1, 0x3, 0x5, 0x14, 0x13)
+        bufferArray = addStartEndFlags(bufferArray.concat(calculateChecksum(bufferArray)))
+        log.debug('response buffer: ', Buffer.from(bufferArray))
         crEvent.emit('respond', bufferArray)
       }
 
