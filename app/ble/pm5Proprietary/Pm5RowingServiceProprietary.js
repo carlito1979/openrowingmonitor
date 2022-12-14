@@ -21,80 +21,100 @@
 import bleno from '@abandonware/bleno'
 import { getFullUUID } from './Pm5ConstantsProprietary.js'
 import ValueReadCharacteristic from './characteristic/ValueReadCharacteristicProprietary.js'
-import MultiplexedCharacteristic from './characteristic/MultiplexedCharacteristicProprietary.js'
-import GeneralStatus from './characteristic/GeneralStatusProprietary.js'
-import AdditionalStatus from './characteristic/AdditionalStatusProprietary.js'
-import AdditionalStatus2 from './characteristic/AdditionalStatus2Proprietary.js'
-import AdditionalStrokeData from './characteristic/AdditionalStrokeDataProprietary.js'
-import StrokeData from './characteristic/StrokeDataProprietary.js'
+
+import GeneralStatus from './characteristic/GeneralStatus.js'
+import AdditionalStatus1 from './characteristic/AdditionalStatus1.js'
+import AdditionalStatus2 from './characteristic/AdditionalStatus2.js'
+import SampleRate from './characteristic/SampleRate.js'
+import StrokeData from './characteristic/StrokeData.js'
+import AdditionalStrokeData from './characteristic/AdditionalStrokeData.js'
+import IntervalData from './characteristic/IntervalData.js'
+import AdditionalIntervalData from './characteristic/AdditionalIntervalData.js'
+import SummaryData from './characteristic/SummaryData.js'
+import AdditionalSummaryData from './characteristic/AdditionalSummaryData.js'
+import ForceCurveData from './characteristic/ForceCurveData.js'
+
 import log from 'loglevel'
 
 export default class PM5RowingService extends bleno.PrimaryService {
   constructor () {
-    const multiplexedCharacteristic = new MultiplexedCharacteristic()
-    const generalStatus = new GeneralStatus(multiplexedCharacteristic)
-    const additionalStatus = new AdditionalStatus(multiplexedCharacteristic)
-    const additionalStatus2 = new AdditionalStatus2(multiplexedCharacteristic)
-    const strokeData = new StrokeData(multiplexedCharacteristic)
-    const additionalStrokeData = new AdditionalStrokeData(multiplexedCharacteristic)
+    const generalStatus = new GeneralStatus()
+    const additionalStatus1 = new AdditionalStatus1()
+    const additionalStatus2 = new AdditionalStatus2()
+    const sampleRate = new SampleRate()
+    const strokeData = new StrokeData()
+    const additionalStrokeData = new AdditionalStrokeData()
+    const intervalData = new IntervalData()
+    const additionalIntervalData = new AdditionalIntervalData()
+    const summaryData = new SummaryData()
+    const additionalSummaryData = new AdditionalSummaryData()
+    const forceCurveData = new ForceCurveData()
+
     super({
       uuid: getFullUUID('0030'),
       characteristics: [
         // C2 rowing general status
         generalStatus,
-        // C2 rowing additional status
-        additionalStatus,
+        // C2 rowing additional status 1
+        additionalStatus1,
         // C2 rowing additional status 2
         additionalStatus2,
-        // C2 rowing general status and additional status samplerate
-        new ValueReadCharacteristic(getFullUUID('0034'), 'samplerate', 'samplerate'),
+        // C2 sample rate
+        sampleRate,
         // C2 rowing stroke data
         strokeData,
         // C2 rowing additional stroke data
         additionalStrokeData,
         // C2 rowing split/interval data
-        new ValueReadCharacteristic(getFullUUID('0037'), 'split data', 'split data'),
+        intervalData,
         // C2 rowing additional split/interval data
-        new ValueReadCharacteristic(getFullUUID('0038'), 'additional split data', 'additional split data'),
+        additionalIntervalData,
         // C2 rowing end of workout summary data
-        new ValueReadCharacteristic(getFullUUID('0039'), 'workout summary', 'workout summary'),
+        summaryData,
         // C2 rowing end of workout additional summary data
-        new ValueReadCharacteristic(getFullUUID('003A'), 'additional workout summary', 'additional workout summary'),
+        additionalSummaryData,
         // C2 rowing heart rate belt information
         new ValueReadCharacteristic(getFullUUID('003B'), 'heart rate belt information', 'heart rate belt information'),
         // C2 force curve data
-        new ValueReadCharacteristic(getFullUUID('003D'), 'force curve data', 'force curve data'),
-        // C2 multiplexed information
-        multiplexedCharacteristic
-      ]
+        forceCurveData
+      ] 
     })
-    this.generalStatus = generalStatus
-    this.additionalStatus = additionalStatus
-    this.additionalStatus2 = additionalStatus2
-    this.strokeData = strokeData
-    this.additionalStrokeData = additionalStrokeData
-    this.multiplexedCharacteristic = multiplexedCharacteristic
+    this.generalStatus = generalStatus,
+    this.additionalStatus1 = additionalStatus1,
+    this.additionalStatus2 = additionalStatus2,
+    this.sampleRate = sampleRate,
+    this.strokeData = strokeData,
+    this.additionalStrokeData = additionalStrokeData,
+    this.intervalData = intervalData,
+    this.additionalIntervalData = additionalIntervalData,
+    this.summaryData = summaryData,
+    this.additionalSummaryData = additionalSummaryData,
+    this.forceCurveData = forceCurveData
   }
 
   notifyData (type, data) {
     if (type === 'strokeFinished' || type === 'metricsUpdate') {
       this.generalStatus.notify(data)
-      this.additionalStatus.notify(data)
+      this.additionalStatus1.notify(data)
       this.additionalStatus2.notify(data)
       this.strokeData.notify(data)
       this.additionalStrokeData.notify(data)
+      this.intervalData.notify(data)
+      this.additionalIntervalData.notify(data)
+      this.forceCurveData.notify(data)
     } else if (type === 'strokeStateChanged') {
       // the stroke state is delivered via the GeneralStatus Characteristic, so we only need to notify that one
       this.generalStatus.notify(data)
     }
 
+/*
     if (type ==='strokeFinished' || type === 'strokeStateChange')  {
       
       log.debug('PM5 Notify RS type: ', type) // debug code
       log.debug('PM5 Notify RS data: ', data) // debug code
       
     }
-
+*/
 
   }
 }

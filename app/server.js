@@ -274,6 +274,14 @@ webServer.on('messageReceived', async (message, client) => {
     case 'toggleAntServer':
       toggleAntServer()
       break
+    // TEMP CODE ADDED IN TO PUT IN A BUTTON ON WEB GUI TO START A RECORDED SESSION
+    case 'replayRowingSession':
+      replayRowingSession(handleRotationImpulse, {
+          filename: '/opt/openrowingmonitor/recordings/ForceUSA.csv', 
+          realtime: true,
+          loop: false
+        })
+      break
     default:
       log.warn('invalid command received:', message)
   }

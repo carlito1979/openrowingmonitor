@@ -62,7 +62,9 @@ export class DashboardActions extends AppElement {
     dialog
 
   render () {
+    // TEMP CODE ADDED IN TO PUT IN A BUTTON ON WEB GUI TO START A RECORDED SESSION
     return html`
+    <button @click=${this.replay}>${icon_upload}</button>
     <button @click=${this.reset}>${icon_undo}</button>
     ${this.renderOptionalButtons()}
     <button @click=${this.switchPeripheralMode}>${icon_bluetooth}</button>
@@ -134,6 +136,11 @@ export class DashboardActions extends AppElement {
         document.exitFullscreen()
       }
     }
+  }
+
+  // TEMP CODE ADDED IN TO PUT IN A BUTTON ON WEB GUI TO START A RECORDED SESSION
+  replay () {
+    this.sendEvent('triggerAction', { command: 'replayRowingSession' })
   }
 
   reset () {
