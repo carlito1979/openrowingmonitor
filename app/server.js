@@ -84,7 +84,7 @@ peripheralManager.on('control', (event) => {
       peripheralManager.notifyStatus({ name: 'startedOrResumedByUser' })
       event.res = true
       break
-    case 'peripheralMode':
+    case 'blePeripheralMode':
       webServer.notifyClients('config', getConfig())
       event.res = true
       break
@@ -194,8 +194,8 @@ workoutUploader.on('resetWorkout', () => {
 const webServer = createWebServer()
 webServer.on('messageReceived', async (message, client) => {
   switch (message.command) {
-    case 'switchPeripheralMode':
-      peripheralManager.switchPeripheralMode()
+    case 'switchBlePeripheralMode':
+      peripheralManager.switchBlePeripheralMode()
       break
     case 'reset':
       resetWorkout()
@@ -221,7 +221,7 @@ webServer.on('clientConnected', (client) => {
 // todo: extract this into some kind of state manager
 function getConfig () {
   return {
-    peripheralMode: peripheralManager.getPeripheralMode(),
+    peripheralMode: peripheralManager.getBlePeripheralMode(),
     stravaUploadEnabled: !!config.stravaClientId && !!config.stravaClientSecret,
     shutdownEnabled: !!config.shutdownCommand
   }
