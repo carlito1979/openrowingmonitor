@@ -88,6 +88,10 @@ peripheralManager.on('control', (event) => {
       webServer.notifyClients('config', getConfig())
       event.res = true
       break
+    case 'antPeripheralMode':
+      webServer.notifyClients('config', getConfig())
+      event.res = true
+      break
     case 'hrmPeripheralMode':
       webServer.notifyClients('config', getConfig())
       event.res = true
@@ -191,6 +195,9 @@ webServer.on('messageReceived', async (message, client) => {
     case 'switchBlePeripheralMode':
       peripheralManager.switchBlePeripheralMode()
       break
+    case 'switchAntPeripheralMode':
+      peripheralManager.switchAntPeripheralMode()
+      break
     case 'switchHrmMode':
       peripheralManager.switchHrmMode()
       break
@@ -219,6 +226,7 @@ webServer.on('clientConnected', (client) => {
 function getConfig () {
   return {
     blePeripheralMode: peripheralManager.getBlePeripheralMode(),
+    antPeripheralMode: peripheralManager.getAntPeripheralMode(),
     hrmPeripheralMode: peripheralManager.getHrmPeripheralMode(),
     stravaUploadEnabled: !!config.stravaClientId && !!config.stravaClientSecret,
     shutdownEnabled: !!config.shutdownCommand
