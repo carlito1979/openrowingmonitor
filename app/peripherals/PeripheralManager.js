@@ -32,6 +32,8 @@ function createPeripheralManager () {
   let hrmPeripheral
   let hrmMode
 
+  let isPeripheralChangeInProgress = false
+
   createBlePeripheral(config.bluetoothMode)
   createHrmPeripheral(config.heartRateMode)
   createAntPeripheral(config.antplusMode)
@@ -61,11 +63,14 @@ function createPeripheralManager () {
   }
 
   function switchBlePeripheralMode (newMode) {
+    if (isPeripheralChangeInProgress) return
+    isPeripheralChangeInProgress = true
     // if now mode was passed, select the next one from the list
     if (newMode === undefined) {
       newMode = bleModes[(bleModes.indexOf(bleMode) + 1) % bleModes.length]
     }
     createBlePeripheral(newMode)
+    isPeripheralChangeInProgress = false
   }
 
   function notifyMetrics (type, metrics) {
@@ -134,10 +139,13 @@ function createPeripheralManager () {
   }
 
   function switchAntPeripheralMode (newMode) {
+    if (isPeripheralChangeInProgress) return
+    isPeripheralChangeInProgress = true
     if (newMode === undefined) {
       newMode = antModes[(antModes.indexOf(antMode) + 1) % antModes.length]
     }
     createAntPeripheral(newMode)
+    isPeripheralChangeInProgress = false
   }
 
   async function createAntPeripheral (newMode) {
@@ -174,10 +182,13 @@ function createPeripheralManager () {
   }
 
   function switchHrmMode (newMode) {
+    if (isPeripheralChangeInProgress) return
+    isPeripheralChangeInProgress = true
     if (newMode === undefined) {
       newMode = hrmModes[(hrmModes.indexOf(hrmMode) + 1) % hrmModes.length]
     }
     createHrmPeripheral(newMode)
+    isPeripheralChangeInProgress = false
   }
 
   async function createHrmPeripheral (newMode) {
