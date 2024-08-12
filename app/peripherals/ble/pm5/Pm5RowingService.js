@@ -75,7 +75,7 @@ export default class PM5RowingService extends bleno.PrimaryService {
     this.multiplexedCharacteristic = multiplexedCharacteristic
   }
 
- notifyData (type, metrics) {
+  notifyData (type, metrics) {
     if (metrics.metricsContext === undefined) return
     switch (true) {
       case (metrics.metricsContext.isSessionStart):
