@@ -8,7 +8,6 @@ import log from 'loglevel'
 import { secondsToTimeString } from '../tools/Helper.js'
 
 function createLogRecorder (config) {
-  let heartRateResetTimer
   let heartRate = 0
 
   // This function handles all incomming commands. As all commands are broadasted to all application parts,
@@ -37,11 +36,6 @@ function createLogRecorder (config) {
 
   // initiated when a new heart rate value is received from heart rate sensor
   async function recordHeartRate (value) {
-    if (heartRateResetTimer)clearInterval(heartRateResetTimer)
-    // set the heart rate to zero if we did not receive a value for some time
-    heartRateResetTimer = setTimeout(() => {
-      heartRate = 0
-    }, 6000)
     heartRate = value.heartrate
   }
 
@@ -63,19 +57,9 @@ function createLogRecorder (config) {
   }
 
   function logMetrics (metrics) {
-    addHeartRateToMetrics(metrics)
-    log.info(`stroke: ${metrics.totalNumberOfStrokes}, dist: ${metrics.totalLinearDistance.toFixed(1)}m, speed: ${metrics.cycleLinearVelocity.toFixed(2)}m/s` +
-      `, pace: ${secondsToTimeString(metrics.cyclePace)}/500m, power: ${Math.round(metrics.cyclePower)}W, cal: ${metrics.totalCalories.toFixed(1)}kcal` +
-      `, SPM: ${metrics.cycleStrokeRate.toFixed(1)}, drive dur: ${metrics.driveDuration.toFixed(2)}s, rec. dur: ${metrics.recoveryDuration.toFixed(2)}s` +
-      `, stroke dur: ${metrics.cycleDuration.toFixed(2)}s`)
-  }
-
-  function addHeartRateToMetrics (metrics) {
-    if (heartRate !== undefined) {
-      metrics.heartrate = heartRate
-    } else {
-      metrics.heartrate = undefined
-    }
+    log.info(`stroke: ${metrics.totalNumberOfStrokes}, dist: ${metrics.totalLinearDistance.toFixed(1)}m, heartrate ${heartRate} BPM` +
+      `, pace: ${secondsToTimeString(metrics.cyclePace)}/500m, stroke dist: ${metrics.cycleDistance.toFixed(1)}m, strokerate: ${metrics.cycleStrokeRate.toFixed(1)} SPM` +
+      `, drive dur: ${metrics.driveDuration.toFixed(2)}s, rec. dur: ${metrics.recoveryDuration.toFixed(2)}s, stroke dur: ${metrics.cycleDuration.toFixed(2)}s`)
   }
 
   return {
