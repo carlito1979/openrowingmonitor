@@ -172,7 +172,7 @@ function createWebServer (config) {
   function getConfig () {
     return {
       blePeripheralMode: config.bluetoothMode,
-      antPeripheralMode: config.antplusMode,
+      antPeripheralMode: config.antPlusMode,
       hrmPeripheralMode: config.heartRateMode,
       stravaUploadEnabled: !!config.stravaClientId && !!config.stravaClientSecret,
       shutdownEnabled: !!config.shutdownCommand
