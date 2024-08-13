@@ -1,6 +1,6 @@
 'use strict'
 /*
-  Open Rowing Monitor, https://github.com/laberning/openrowingmonitor
+  Open Rowing Monitor, https://github.com/JaapvanEkris/openrowingmonitor
 
   Merges the different config files and presents the configuration to the application
   Checks the config for plausibilit, fixes the errors when needed
@@ -28,7 +28,7 @@ function checkConfig (configToCheck) {
   checkRangeValue(configToCheck, 'gpioTriggeredFlank', ['Up', 'Down', 'Both'], true, 'Up')
   checkIntegerValue(configToCheck, 'appPriority', configToCheck.gpioPriority, 0, true, true, 0)
   checkIntegerValue(configToCheck, 'webUpdateInterval', 80, 1000, false, true, 1000)
-  checkIntegerValue(configToCheck, 'peripheralUpdateInterval', 80, 1000, false, true, 1000)
+  checkIntegerValue(configToCheck, 'peripheralUpdateInterval', 80, 1000, false, true, 1000) // Please note: the minimum update interval for iOS is 20ms, for android 7.5ms
   checkRangeValue(configToCheck, 'bluetoothMode', ['OFF', 'PM5', 'FTMS', 'FTMSBIKE', 'CPS', 'CSC'], true, 'OFF')
   checkRangeValue(configToCheck, 'antplusMode', ['OFF', 'FE'], true, 'OFF')
   checkRangeValue(configToCheck, 'heartRateMode', ['OFF', 'ANT', 'BLE'], true, 'OFF')
