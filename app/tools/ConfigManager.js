@@ -31,7 +31,7 @@ function checkConfig (configToCheck) {
   checkIntegerValue(configToCheck, 'peripheralUpdateInterval', 100, 1000, false, true, 1000) // Please note: the minimum update interval for iOS is 20ms, for android 7.5ms, and some PM5 messages send 5 telegrams
   checkRangeValue(configToCheck, 'bluetoothMode', ['OFF', 'PM5', 'FTMS', 'FTMSBIKE', 'CPS', 'CSC'], true, 'OFF')
   if (Object.keys(configToCheck).includes('antplusMode')) {
-    log.error(`WARNING: An old version of the config file was detected, please update the name of the following setting in the config.js file: antplusMode into antPlusMode`)
+    log.error('WARNING: An old version of the config file was detected, please update the name of the following setting in the config.js file: antplusMode into antPlusMode')
     configToCheck.antPlusMode = configToCheck.antplusMode
   }
   checkRangeValue(configToCheck, 'antPlusMode', ['OFF', 'FE'], true, 'OFF')
@@ -66,12 +66,12 @@ function checkConfig (configToCheck) {
   }
   checkFloatValue(configToCheck.rowerSettings, 'flywheelInertia', 0, null, false, false, null)
   if (Object.keys(configToCheck.rowerSettings).includes('minumumForceBeforeStroke')) {
-    log.error(`WARNING: An old version of the config file was detected, please update the name of the following setting in the config.js file: minumumForceBeforeStroke into minimumForceBeforeStroke`)
+    log.error('WARNING: An old version of the config file was detected, please update the name of the following setting in the config.js file: minumumForceBeforeStroke into minimumForceBeforeStroke')
     configToCheck.rowerSettings.minimumForceBeforeStroke = configToCheck.rowerSettings.minumumForceBeforeStroke
   }
   checkFloatValue(configToCheck.rowerSettings, 'minimumForceBeforeStroke', 0, 500, true, true, 0)
   if (Object.keys(configToCheck.rowerSettings).includes('minumumRecoverySlope')) {
-    log.error(`WARNING: An old version of the config file was detected, please update the name of the following setting in the config.js file: minumumRecoverySlope into minimumRecoverySlope`)
+    log.error('WARNING: An old version of the config file was detected, please update the name of the following setting in the config.js file: minumumRecoverySlope into minimumRecoverySlope')
     configToCheck.rowerSettings.minimumRecoverySlope = configToCheck.rowerSettings.minumumRecoverySlope
   }
   checkFloatValue(configToCheck.rowerSettings, 'minimumRecoverySlope', 0, null, true, true, 0)
