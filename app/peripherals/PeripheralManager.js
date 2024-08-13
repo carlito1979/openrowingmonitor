@@ -1,6 +1,6 @@
 'use strict'
 /*
-  Open Rowing Monitor, https://github.com/laberning/openrowingmonitor
+  Open Rowing Monitor, https://github.com/JaapvanEkris/openrowingmonitor
 
   This manager creates the different Bluetooth Low Energy (BLE) Peripherals and allows
   switching between them
@@ -19,7 +19,6 @@ import { createFEPeripheral } from './ant/FEPeripheral.js'
 const bleModes = ['FTMS', 'FTMSBIKE', 'PM5', 'CSC', 'CPS', 'OFF']
 const antModes = ['FE', 'OFF']
 const hrmModes = ['ANT', 'BLE', 'OFF']
-let hrmResetTimer
 
 function createPeripheralManager (config) {
   const emitter = new EventEmitter()
@@ -32,6 +31,7 @@ function createPeripheralManager (config) {
 
   let hrmPeripheral
   let hrmMode
+  let hrmResetTimer
 
   let isPeripheralChangeInProgress = false
 
@@ -88,47 +88,21 @@ function createPeripheralManager (config) {
     }
   }
 
-  /* These getters are now obsolete???
-  function getBlePeripheral () {
-    return blePeripheral
-  }
-
-  function getBlePeripheralMode () {
-    return bleMode
-  }
-
-  function getAntPeripheral () {
-    return antPeripheral
-  }
-
-  function getAntPeripheralMode () {
-    return antMode
-  }
-
-  function getHrmPeripheral () {
-    return hrmPeripheral
-  }
-
-  function getHrmPeripheralMode () {
-    return hrmMode
-  }
-  */
-
   function switchBlePeripheralMode (newMode) {
     if (isPeripheralChangeInProgress) return
     isPeripheralChangeInProgress = true
-    // if now mode was passed, select the next one from the list
+    // if no mode was passed, select the next one from the list
     if (newMode === undefined) {
       newMode = bleModes[(bleModes.indexOf(bleMode) + 1) % bleModes.length]
     }
-    createBlePeripheral(newMode)
     config.bluetoothMode = newMode
+    createBlePeripheral(newMode)
     isPeripheralChangeInProgress = false
   }
 
-  function notifyMetrics (type, metrics) {
-    if (bleMode !== 'OFF') { blePeripheral?.notifyData(type, metrics) }
-    if (antMode !== 'OFF') { antPeripheral?.notifyData(type, metrics) }
+  function notifyMetrics (metrics) {
+    if (bleMode !== 'OFF') { blePeripheral?.notifyData(metrics) }
+    if (antMode !== 'OFF') { antPeripheral?.notifyData(metrics) }
   }
 
   function notifyStatus (status) {
@@ -141,14 +115,12 @@ function createPeripheralManager (config) {
       await blePeripheral?.destroy()
       blePeripheral = undefined
     }
-
     switch (newMode) {
       case 'PM5':
         log.info('bluetooth profile: Concept2 PM5')
-        blePeripheral = createPm5Peripheral(controlCallback)
+        blePeripheral = createPm5Peripheral(controlCallback, config)
         bleMode = 'PM5'
         break
-
       case 'FTMSBIKE':
         log.info('bluetooth profile: FTMS Indoor Bike')
         blePeripheral = createFtmsPeripheral(controlCallback, {
@@ -156,19 +128,16 @@ function createPeripheralManager (config) {
         })
         bleMode = 'FTMSBIKE'
         break
-
       case 'CSC':
         log.info('bluetooth profile: Cycling Speed and Cadence')
         blePeripheral = createCscPeripheral()
         bleMode = 'CSC'
         break
-
       case 'CPS':
         log.info('bluetooth profile: Cycling Power Meter')
         blePeripheral = createCpsPeripheral()
         bleMode = 'CPS'
         break
-
       case 'FTMS':
         log.info('bluetooth profile: FTMS Rower')
         blePeripheral = createFtmsPeripheral(controlCallback, {
@@ -176,7 +145,6 @@ function createPeripheralManager (config) {
         })
         bleMode = 'FTMS'
         break
-
       default:
         log.info('bluetooth profile: Off')
         bleMode = 'OFF'
@@ -197,8 +165,8 @@ function createPeripheralManager (config) {
     if (newMode === undefined) {
       newMode = antModes[(antModes.indexOf(antMode) + 1) % antModes.length]
     }
-    createAntPeripheral(newMode)
     config.antplusMode = newMode
+    createAntPeripheral(newMode)
     isPeripheralChangeInProgress = false
   }
 
@@ -251,8 +219,8 @@ function createPeripheralManager (config) {
     if (newMode === undefined) {
       newMode = hrmModes[(hrmModes.indexOf(hrmMode) + 1) % hrmModes.length]
     }
-    createHrmPeripheral(newMode)
     config.heartRateMode = newMode
+    createHrmPeripheral(newMode)
     isPeripheralChangeInProgress = false
   }
 
@@ -309,7 +277,7 @@ function createPeripheralManager (config) {
             emitter.emit('heartRateMeasurement', heartRateMeasurement)
           }, 6000)
         }
-        // Make sure we check the HRM validity here, so the rest of the app doesn't have to
+        // Make sure we check the HRM validity here, so the rest of the app doesn't have to																						   
         if (heartRateMeasurement.heartrate !== undefined && config.userSettings.restingHR <= heartRateMeasurement.heartrate && heartRateMeasurement.heartrate <= config.userSettings.maxHR) {
           emitter.emit('heartRateMeasurement', heartRateMeasurement)
         } else {
@@ -348,18 +316,9 @@ function createPeripheralManager (config) {
 
   return Object.assign(emitter, {
     handleCommand,
-    /* All these commands are now internal or even obsolete??
-    shutdownAllPeripherals,
-    getBlePeripheral,
-    getBlePeripheralMode,
-    getAntPeripheral,
-    getAntPeripheralMode,
-    getHrmPeripheral,
-    getHrmPeripheralMode,
     switchHrmMode,
     switchBlePeripheralMode,
     switchAntPeripheralMode,
-    */
     notifyMetrics,
     notifyStatus
   })
