@@ -17,13 +17,13 @@ function createCpsPeripheral () {
   const cyclingPowerService = new CyclingPowerService((event) => log.debug('CPS Control Point', event))
   const broadcastInterval = config.peripheralUpdateInterval
   let lastKnownMetrics = {
-      sessiontype: 'JustRow',
-      sessionStatus: 'WaitingForStart',
-      strokeState: 'WaitingForDrive',
-      totalMovingTime: 0,
-      totalLinearDistance: 0,
-      dragFactor: config.rowerSettings.dragFactor
-    }
+    sessiontype: 'JustRow',
+    sessionStatus: 'WaitingForStart',
+    strokeState: 'WaitingForDrive',
+    totalMovingTime: 0,
+    totalLinearDistance: 0,
+    dragFactor: config.rowerSettings.dragFactor
+  }
   let timer = setTimeout(onBroadcastInterval, broadcastInterval)
 
   bleno.on('stateChange', (state) => {
