@@ -35,7 +35,7 @@ function createSessionManager (config) {
   let heartRateBatteryLevel = 0
 
   metrics = rowingStatistics.getMetrics()
-  resetMetricsContext()	 
+  resetMetricsContext()
   emitMetrics('metricsUpdate')
 
   // This function handles all incomming commands. As all commands are broadasted to all application parts,
