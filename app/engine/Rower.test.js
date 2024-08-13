@@ -1,6 +1,7 @@
 'use strict'
 /*
-
+  Open Rowing Monitor, https://github.com/JaapvanEkris/openrowingmonitor
+  
   This test is a test of the Rower object, that tests wether this object fills all fields correctly, given one validated rower, (the
   Concept2 RowErg) using a validated cycle of strokes. This thoroughly tests the raw physics of the translation of Angular physics
   to Linear physics. The combination with all possible known rowers is tested when testing the above function RowingStatistics, as
@@ -19,10 +20,10 @@ const baseConfig = {
   smoothing: 1,
   flankLength: 11,
   minimumStrokeQuality: 0.30,
-  minumumRecoverySlope: 0,
+  minimumRecoverySlope: 0,
   autoAdjustRecoverySlope: true,
   autoAdjustRecoverySlopeMargin: 0.10,
-  minumumForceBeforeStroke: 50,
+  minimumForceBeforeStroke: 50,
   minimumRecoveryTime: 0.9,
   minimumDriveTime: 0.4,
   maximumStrokeTimeBeforePause: 6.0,
@@ -68,10 +69,10 @@ test('Correct Rower behaviour for three noisefree strokes with dynamic dragfacto
     smoothing: 1,
     flankLength: 11,
     minimumStrokeQuality: 0.30,
-    minumumRecoverySlope: 0,
+    minimumRecoverySlope: 0,
     autoAdjustRecoverySlope: true,
     autoAdjustRecoverySlopeMargin: 0.10,
-    minumumForceBeforeStroke: 50,
+    minimumForceBeforeStroke: 50,
     minimumDriveTime: 0.1,
     minimumRecoveryTime: 0.2,
     maximumStrokeTimeBeforePause: 0.2,
