@@ -1,8 +1,8 @@
 'use strict'
 /*
-  Open Rowing Monitor, https://github.com/laberning/openrowingmonitor
+  Open Rowing Monitor, https://github.com/JaapvanEkris/openrowingmonitor
 
-  This Module manages the session and the session state
+  This Module calculates the training specific metrics.
 */
 import { EventEmitter } from 'events'
 import { createRowingStatistics } from './RowingStatistics.js'
@@ -28,19 +28,17 @@ function createSessionManager (config) {
   let intervalTargetTime = 0
   let intervalPrevAccumulatedDistance = 0
   let intervalPrevAccumulatedTime = 0
+  let splitDistance = 500 // ToDo: make flexible
+  let splitNumber = 0
+  let splitPrevAccumulatedDistance = 0
   const distanceOverTime = createOLSLinearSeries(Math.min(4, numOfDataPointsForAveraging))
   let heartrate = 0
   let heartRateBatteryLevel = 0
 
   metrics = rowingStatistics.getMetrics()
   resetMetricsContext()
-  enrichMetrics()
+				 
   emitMetrics('metricsUpdate')
-
-  // notify bluetooth peripherall each second (even if data did not change)
-  // todo: the FTMS protocol also supports that peripherals deliver a preferred update interval
-  // we could respect this and set the update rate accordingly
-  setInterval(emitPeripheralMetrics, peripheralUpdateInterval)
 
   // This function handles all incomming commands. As all commands are broadasted to all application parts,
   // we need to filter here what the RowingEngine will react to and what it will ignore
@@ -96,7 +94,7 @@ function createSessionManager (config) {
       default:
         log.error(`Recieved unknown command: ${commandName}`)
     }
-    enrichMetrics()
+				   
     emitMetrics('metricsUpdate') // We do this regardless of trigger, as it might populate a newly initialized peripheral as well
     lastSessionState = sessionState
   }
@@ -110,12 +108,14 @@ function createSessionManager (config) {
   }
 
   function stopTraining () {
+    distanceOverTime.push(metrics.totalMovingTime, metrics.totalLinearDistance)
     rowingStatistics.stopTraining()
   }
 
   // clear the metrics in case the user pauses rowing
   function pauseTraining () {
     log.debug('*** Paused rowing ***')
+    distanceOverTime.push(metrics.totalMovingTime, metrics.totalLinearDistance)
     rowingStatistics.pauseTraining()
     noSpontaneousPauses++
   }
@@ -125,6 +125,7 @@ function createSessionManager (config) {
     rowingStatistics.resetTraining()
     rowingStatistics.allowResumeTraining()
     metrics = rowingStatistics.getMetrics()
+    intervalSettings = null
     intervalSettings = []
     noSpontaneousPauses = 0
     currentIntervalNumber = -1
@@ -132,6 +133,8 @@ function createSessionManager (config) {
     intervalTargetTime = 0
     intervalPrevAccumulatedDistance = 0
     intervalPrevAccumulatedTime = 0
+    splitNumber = 0
+    splitPrevAccumulatedDistance = 0
     distanceOverTime.reset()
     resetMetricsContext()
     sessionState = 'WaitingForStart'
@@ -190,7 +193,10 @@ function createSessionManager (config) {
       case (lastSessionState === 'Rowing' && isIntervalTargetReached() && isNextIntervalAvailable()):
         activateNextIntervalParameters()
         sessionState = 'Rowing'
+        splitNumber = 0
+        splitPrevAccumulatedDistance = intervalPrevAccumulatedDistance
         metrics.metricsContext.isIntervalStart = true
+        metrics.metricsContext.isSplitEnd = true
         break
       case (lastSessionState === 'Rowing' && isIntervalTargetReached()):
         // Here we do NOT want zero the metrics, as we want to keep the metrics we had when we crossed the finishline
@@ -198,13 +204,19 @@ function createSessionManager (config) {
         sessionState = 'Stopped'
         metrics.metricsContext.isSessionStop = true
         break
+      case (lastSessionState === 'Rowing' && isSplitBoundaryReached()):
+        sessionState = 'Rowing'
+        splitNumber++
+        splitPrevAccumulatedDistance = intervalPrevAccumulatedDistance + (splitNumber * splitDistance)
+        metrics.metricsContext.isSplitEnd = true
+        break
       case (lastSessionState === 'Rowing'):
         sessionState = 'Rowing'
         break
       default:
         log.error(`Time: ${metrics.totalMovingTime}, combination of ${sessionState} and state ${metrics.strokeState()} found in the Rowing Statistics, which is not captured by Finite State Machine`)
     }
-    enrichMetrics()
+				   
     emitMetrics('metricsUpdate')
     lastSessionState = sessionState
   }
@@ -213,6 +225,7 @@ function createSessionManager (config) {
   function resetMetricsContext () {
     metrics.metricsContext.isSessionStart = false
     metrics.metricsContext.isIntervalStart = false
+    metrics.metricsContext.isSplitEnd = false
     metrics.metricsContext.isPauseStart = false
     metrics.metricsContext.isPauseEnd = false
     metrics.metricsContext.isSessionStop = false
@@ -286,6 +299,19 @@ function createSessionManager (config) {
     } else {
       log.error('Interval error: there is no next interval!')
     }
+
+    // As the interval has changed, we need to reset the splitnumber as well
+    splitNumber = 0
+  }
+
+  // initiated when a new heart rate value is received from heart rate sensor
+  function isSplitBoundaryReached () {
+    if ((metrics.totalLinearDistance - intervalPrevAccumulatedDistance) >= ((splitNumber + 1) * splitDistance)) {
+      // We have exceeded the boundary of the split
+      return true
+    } else {
+      return false
+    }
   }
 
   // initiated when a new heart rate value is received from heart rate sensor
@@ -294,12 +320,8 @@ function createSessionManager (config) {
     heartRateBatteryLevel = value.batteryLevel
   }
 
-  function emitPeripheralMetrics () { // ToDo: REMOVE THIS AS THE PERIPHERALS SHOULD DO THIS THEMSELVES!!
-    enrichMetrics()
-    emitMetrics('peripheralMetricsUpdate')
-  }
-
   function emitMetrics (emitType = 'metricsUpdate') {
+    enrichMetrics()
     emitter.emit(emitType, metrics)
   }
 
@@ -312,6 +334,8 @@ function createSessionManager (config) {
     metrics.intervalTargetTime = intervalTargetTime > intervalPrevAccumulatedTime ? intervalTargetTime - intervalPrevAccumulatedTime : 0
     metrics.intervalLinearDistance = metrics.totalLinearDistance - intervalPrevAccumulatedDistance
     metrics.intervalTargetDistance = intervalTargetDistance > intervalPrevAccumulatedDistance ? intervalTargetDistance - intervalPrevAccumulatedDistance : 0
+    metrics.splitNumber = metrics.metricsContext.isSplitEnd ? splitNumber - 1 : splitNumber // This is needed to satisfy the RowingData recorder, it needs the start of the split to mark the end of the previous split
+    metrics.splitLinearDistance = metrics.metricsContext.isSplitEnd ? splitDistance : metrics.totalLinearDistance - splitPrevAccumulatedDistance // This is needed to satisfy the RowingData recorder
     metrics.cycleProjectedEndTime = intervalTargetDistance > 0 ? distanceOverTime.projectY(intervalTargetDistance) : intervalTargetTime
     metrics.cycleProjectedEndLinearDistance = intervalTargetTime > 0 ? distanceOverTime.projectX(intervalTargetTime) : intervalTargetDistance
     metrics.heartrate = heartrate > 30 ? heartrate : 0 // OPRUIMEN VAN DEZE INJECTIE
