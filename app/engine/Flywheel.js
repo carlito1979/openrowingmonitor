@@ -1,6 +1,6 @@
 'use strict'
 /*
-  Open Rowing Monitor, https://github.com/laberning/openrowingmonitor
+  Open Rowing Monitor, https://github.com/JaapvanEkris/openrowingmonitor
 
   This models the flywheel with all of its attributes, which we can also test for being powered
 
@@ -12,7 +12,7 @@
 
   Please note2: This implements Linear regression to obtain the drag factor. We deliberatly DO NOT include the flank data
   as we don't know wether they will belong to a Drive or Recovery phase. So we include things which we know for certain that
-  are part of a specific phase, i.e. dirtyDataPoints[flankLength], which will be eliminated from the flank
+  are part of a specific phase, i.e. dirtyDataPoints[flankLength], which wifll be eliminated from the flank
 
   The calculation of angular velocity and acceleration is based on Quadratic Regression, as the second derivative tends to be
   quite fragile when small errors are thrown in the mix. The math behind this approach can be found in https://physics.info/motion-equations/
@@ -31,7 +31,7 @@ function createFlywheel (rowerSettings) {
   const angularDisplacementPerImpulse = (2.0 * Math.PI) / rowerSettings.numOfImpulsesPerRevolution
   const flankLength = rowerSettings.flankLength
   const minimumDragFactorSamples = Math.floor(rowerSettings.minimumRecoveryTime / rowerSettings.maximumTimeBetweenImpulses)
-  const minumumTorqueBeforeStroke = rowerSettings.minumumForceBeforeStroke * (rowerSettings.sprocketRadius / 100)
+  const minimumTorqueBeforeStroke = rowerSettings.minimumForceBeforeStroke * (rowerSettings.sprocketRadius / 100)
   const currentDt = createStreamFilter(rowerSettings.smoothing, rowerSettings.maximumTimeBetweenImpulses)
   const _deltaTime = createOLSLinearSeries(flankLength)
   const _angularDistance = createTSQuadraticSeries(flankLength)
@@ -40,7 +40,7 @@ function createFlywheel (rowerSettings) {
   const drag = createStreamFilter(rowerSettings.dragFactorSmoothing, (rowerSettings.dragFactor / 1000000))
   const recoveryDeltaTime = createOLSLinearSeries()
   const strokedetectionMinimalGoodnessOfFit = rowerSettings.minimumStrokeQuality
-  const minumumRecoverySlope = createStreamFilter(rowerSettings.dragFactorSmoothing, rowerSettings.minumumRecoverySlope)
+  const minimumRecoverySlope = createStreamFilter(rowerSettings.dragFactorSmoothing, rowerSettings.minimumRecoverySlope)
   let _deltaTimeBeforeFlank
   let _angularVelocityAtBeginFlank
   let _angularVelocityBeforeFlank
@@ -156,7 +156,7 @@ function createFlywheel (rowerSettings) {
       log.debug(`*** Calculated drag factor: ${(slopeToDrag(recoveryDeltaTime.slope()) * 1000000).toFixed(4)}, no. samples: ${recoveryDeltaTime.length()}, Goodness of Fit: ${recoveryDeltaTime.goodnessOfFit().toFixed(4)}`)
       if (rowerSettings.autoAdjustRecoverySlope) {
         // We are allowed to autoadjust stroke detection slope as well, so let's do that
-        minumumRecoverySlope.push((1 - rowerSettings.autoAdjustRecoverySlopeMargin) * recoveryDeltaTime.slope())
+        minimumRecoverySlope.push((1 - rowerSettings.autoAdjustRecoverySlopeMargin) * recoveryDeltaTime.slope())
         log.debug(`*** Calculated recovery slope: ${recoveryDeltaTime.slope().toFixed(6)}, Goodness of Fit: ${recoveryDeltaTime.goodnessOfFit().toFixed(4)}`)
       } else {
         // We aren't allowed to adjust the slope, let's report the slope to help help the user configure it
@@ -240,7 +240,7 @@ function createFlywheel (rowerSettings) {
   }
 
   function isUnpowered () {
-    if ((deltaTimeSlopeAbove(minumumRecoverySlope.clean()) || torqueAbsent()) && _deltaTime.length() >= flankLength) {
+    if ((deltaTimeSlopeAbove(minimumRecoverySlope.clean()) || torqueAbsent()) && _deltaTime.length() >= flankLength) {
       // We reached the minimum number of increasing currentDt values
       return true
     } else {
@@ -249,7 +249,7 @@ function createFlywheel (rowerSettings) {
   }
 
   function isPowered () {
-    if ((deltaTimeSlopeBelow(minumumRecoverySlope.clean()) && torquePresent()) || _deltaTime.length() < flankLength) {
+    if ((deltaTimeSlopeBelow(minimumRecoverySlope.clean()) && torquePresent()) || _deltaTime.length() < flankLength) {
       return true
     } else {
       return false
@@ -297,7 +297,7 @@ function createFlywheel (rowerSettings) {
 
   function torquePresent () {
     // This is a typical indication that the flywheel is decelerating which might work on some machines: successive currentDt's are increasing
-    if (_torqueAtBeginFlank > minumumTorqueBeforeStroke) {
+    if (_torqueAtBeginFlank > minimumTorqueBeforeStroke) {
       return true
     } else {
       return false
@@ -306,7 +306,7 @@ function createFlywheel (rowerSettings) {
 
   function torqueAbsent () {
     // This is a typical indication that the flywheel is Accelerating which might work on some machines: successive currentDt's are decreasing
-    if (_torqueAtBeginFlank < minumumTorqueBeforeStroke) {
+    if (_torqueAtBeginFlank < minimumTorqueBeforeStroke) {
       return true
     } else {
       return false
