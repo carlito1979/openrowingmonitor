@@ -1,6 +1,6 @@
 'use strict'
 /*
-  Open Rowing Monitor, https://github.com/laberning/openrowingmonitor
+  Open Rowing Monitor, https://github.com/JaapvanEkris/openrowingmonitor
 
   Creates a Bluetooth Low Energy (BLE) Peripheral with all the Services that are required for
   a Cycling Speed and Cadence Profile
@@ -15,6 +15,17 @@ import AdvertisingDataBuilder from './common/AdvertisingDataBuilder.js'
 function createCscPeripheral () {
   const peripheralName = `${config.ftmsRowerPeripheralName} (CSC)`
   const cyclingSpeedCadenceService = new CyclingSpeedCadenceService((event) => log.debug('CSC Control Point', event))
+
+  const broadcastInterval = config.peripheralUpdateInterval
+  let lastKnownMetrics = {
+      sessiontype: 'JustRow',
+      sessionStatus: 'WaitingForStart',
+      strokeState: 'WaitingForDrive',
+      totalMovingTime: 0,
+      totalLinearDistance: 0,
+      dragFactor: config.rowerSettings.dragFactor
+    }
+  let timer = setTimeout(onBroadcastInterval, broadcastInterval)
 
   bleno.on('stateChange', (state) => {
     triggerAdvertising(state)
@@ -62,6 +73,7 @@ function createCscPeripheral () {
   })
 
   function destroy () {
+    clearTimeout(timer)
     return new Promise((resolve) => {
       bleno.disconnect()
       bleno.removeAllListeners()
@@ -87,10 +99,15 @@ function createCscPeripheral () {
     }
   }
 
-  function notifyData (type, data) {
-    if (type === 'strokeFinished' || type === 'metricsUpdate') {
-      cyclingSpeedCadenceService.notifyData(data)
-    }
+  // present current rowing metrics to FTMS central
+  function onBroadcastInterval () {
+    cyclingSpeedCadenceService.notifyData(lastKnownMetrics)
+    timer = setTimeout(onBroadcastInterval, broadcastInterval)
+  }
+
+  // Records the last known rowing metrics to FTMS central
+  function notifyData (data) {
+    lastKnownMetrics = data
   }
 
   // CSC does not have status characteristic
