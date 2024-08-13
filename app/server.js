@@ -92,7 +92,7 @@ function handleRotationImpulse (dataPoint) {
   sessionManager.handleRotationImpulse(dataPoint)
 }
 
-const recordingManager = new createRecordingManager(config)
+const recordingManager = createRecordingManager(config)
 const workoutUploader = createWorkoutUploader(config, recordingManager)
 
 const sessionManager = createSessionManager(config)
