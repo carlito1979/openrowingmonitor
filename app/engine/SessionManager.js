@@ -13,7 +13,6 @@ import loglevel from 'loglevel'
 const log = loglevel.getLogger('RowingEngine')
 
 function createSessionManager (config) {
-  const peripheralUpdateInterval = config.peripheralUpdateInterval
   const numOfDataPointsForAveraging = config.numOfPhasesForAveragingScreenData
   const emitter = new EventEmitter()
   const rowingStatistics = createRowingStatistics(config)
@@ -28,7 +27,7 @@ function createSessionManager (config) {
   let intervalTargetTime = 0
   let intervalPrevAccumulatedDistance = 0
   let intervalPrevAccumulatedTime = 0
-  let splitDistance = 500 // ToDo: make flexible
+  const splitDistance = 500 // ToDo: make flexible
   let splitNumber = 0
   let splitPrevAccumulatedDistance = 0
   const distanceOverTime = createOLSLinearSeries(Math.min(4, numOfDataPointsForAveraging))
@@ -36,8 +35,7 @@ function createSessionManager (config) {
   let heartRateBatteryLevel = 0
 
   metrics = rowingStatistics.getMetrics()
-  resetMetricsContext()
-				 
+  resetMetricsContext()	 
   emitMetrics('metricsUpdate')
 
   // This function handles all incomming commands. As all commands are broadasted to all application parts,
@@ -94,8 +92,7 @@ function createSessionManager (config) {
       default:
         log.error(`Recieved unknown command: ${commandName}`)
     }
-				   
-    emitMetrics('metricsUpdate') // We do this regardless of trigger, as it might populate a newly initialized peripheral as well
+    emitMetrics('metricsUpdate')
     lastSessionState = sessionState
   }
 
@@ -216,7 +213,6 @@ function createSessionManager (config) {
       default:
         log.error(`Time: ${metrics.totalMovingTime}, combination of ${sessionState} and state ${metrics.strokeState()} found in the Rowing Statistics, which is not captured by Finite State Machine`)
     }
-				   
     emitMetrics('metricsUpdate')
     lastSessionState = sessionState
   }
