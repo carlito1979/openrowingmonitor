@@ -1,9 +1,6 @@
 'use strict'
 /*
-  Open Rowing Monitor, https://github.com/laberning/openrowingmonitor
-
-  This start file is currently a mess, but we are getting more structure as we know what this should do
-  todo: refactor this as we progress
+  Open Rowing Monitor, https://github.com/JaapvanEkris/openrowingmonitor
 */
 import os from 'os'
 import child_process from 'child_process'
@@ -14,9 +11,11 @@ import { createSessionManager } from './engine/SessionManager.js'
 import { createWebServer } from './WebServer.js'
 import { createPeripheralManager } from './peripherals/PeripheralManager.js'
 import { createRecordingManager } from './recorders/recordingManager.js'
+import fs from 'fs'
 // eslint-disable-next-line no-unused-vars
 import { replayRowingSession } from './tools/RowingRecorder.js'
-import { createWorkoutUploader } from './engine/WorkoutUploader.js'
+import { createWorkoutUploader } from './recorders/WorkoutUploader.js'
+
 const exec = promisify(child_process.exec)
 
 const shutdownEnabled = !!config.shutdownCommand
@@ -94,47 +93,16 @@ function handleRotationImpulse (dataPoint) {
   sessionManager.handleRotationImpulse(dataPoint)
 }
 
-const recordingManager = createRecordingManager(config)
+const recordingManager = new createRecordingManager(config)
+const workoutUploader = createWorkoutUploader(config, recordingManager)
+
 const sessionManager = createSessionManager(config)
 
 sessionManager.on('metricsUpdate', (metrics) => {
   webServer.presentRowingMetrics(metrics)
   recordingManager.recordMetrics(metrics)
-  // ToDo: move underlying decissions into all individual peripheralManager's peripherals
-  // BE AWARE: This construct has an implicit filter as the regular in-stroke metricsUpdates will not be sent to the peripheralManager, as it is caught by the default
-  // As peripheralMetricsUpdate is needed (which still is triggered by the sessionmanager), we can not remove this setup here until all peripherals do their own timing and filtering
-  switch (true) {
-    case (metrics.metricsContext.isSessionStop === true):
-      // This is called when the rowingmachine is stopped for some reason, could be reaching the end of the session,
-      // could be user intervention
-      peripheralManager.notifyMetrics('metricsUpdate', metrics)
-      break
-    case (metrics.metricsContext.isIntervalStart === true):
-      // This is called when the sessionManager concludes the intervaltarget is reached
-      // Update all screens to reflect this change, as targetTime and targetDistance have changed
-      // ToDo: recording this event in the recordings accordingly should be done as well
-      peripheralManager.notifyMetrics('metricsUpdate', metrics)
-      break
-    case (metrics.metricsContext.isPauseStart === true):
-      peripheralManager.notifyMetrics('strokeStateChanged', metrics)
-      break
-    case (metrics.metricsContext.isRecoveryStart === true):
-      peripheralManager.notifyMetrics('strokeStateChanged', metrics)
-      break
-    case (metrics.metricsContext.isDriveStart === true):
-      peripheralManager.notifyMetrics('strokeFinished', metrics)
-      break
-    default:
-      // Nothing to do here
-  }
+  peripheralManager.notifyMetrics(metrics)
 })
-
-// ToDo: REMOVE THIS AS SOON AS PERIPHERALS CAN DO THEIR OWN CACHING AND TIMING
-sessionManager.on('peripheralMetricsUpdate', (metrics) => {
-  peripheralManager.notifyMetrics('metricsUpdate', metrics)
-})
-
-const workoutUploader = createWorkoutUploader(config, recordingManager)
 
 workoutUploader.on('authorizeStrava', (data, client) => {
   webServer.notifyClient(client, 'authorizeStrava', data)
@@ -150,7 +118,6 @@ webServer.on('messageReceived', async (message, client) => {
     recordingManager.handleCommand(message.command)
     peripheralManager.handleCommand(message.command)
     webServer.handleCommand(message.command)
-    // ToDo: refactor the Strava uploader to something that fits in the architecture
     switch (message.command) {
       case 'uploadTraining':
         workoutUploader.upload(client)
