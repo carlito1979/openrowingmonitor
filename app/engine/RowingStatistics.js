@@ -36,7 +36,7 @@ function createRowingStatistics (config) {
   const recoveryDuration = createStreamFilter(numOfDataPointsForAveraging, config.rowerSettings.minimumRecoveryTime)
   const driveAverageHandleForce = createStreamFilter(numOfDataPointsForAveraging, 0.0)
   const drivePeakHandleForce = createStreamFilter(numOfDataPointsForAveraging, 0.0)
-  const driveHandleForceCurve = createCurveAligner(config.rowerSettings.minumumForceBeforeStroke)
+  const driveHandleForceCurve = createCurveAligner(config.rowerSettings.minimumForceBeforeStroke)
   const driveHandleVelocityCurve = createCurveAligner(1.0)
   const driveHandlePowerCurve = createCurveAligner(50)
   let dragFactor = config.rowerSettings.dragFactor
