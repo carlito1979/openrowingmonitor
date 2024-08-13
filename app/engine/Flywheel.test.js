@@ -1,6 +1,6 @@
 'use strict'
 /*
-  Open Rowing Monitor, https://github.com/laberning/openrowingmonitor
+  Open Rowing Monitor, https://github.com/JaapvanEkris/openrowingmonitor
 */
 import { test } from 'uvu'
 import * as assert from 'uvu/assert'
@@ -15,10 +15,10 @@ const baseConfig = {
   smoothing: 1,
   flankLength: 11,
   minimumStrokeQuality: 0.30,
-  minumumRecoverySlope: 0,
+  minimumRecoverySlope: 0,
   autoAdjustRecoverySlope: true,
   autoAdjustRecoverySlopeMargin: 0.10,
-  minumumForceBeforeStroke: 50,
+  minimumForceBeforeStroke: 50,
   minimumRecoveryTime: 2,
   minimumTimeBetweenImpulses: 0.005,
   maximumTimeBetweenImpulses: 0.02,
