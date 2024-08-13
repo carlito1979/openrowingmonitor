@@ -11,7 +11,6 @@ import { createSessionManager } from './engine/SessionManager.js'
 import { createWebServer } from './WebServer.js'
 import { createPeripheralManager } from './peripherals/PeripheralManager.js'
 import { createRecordingManager } from './recorders/recordingManager.js'
-import fs from 'fs'
 // eslint-disable-next-line no-unused-vars
 import { replayRowingSession } from './tools/RowingRecorder.js'
 import { createWorkoutUploader } from './recorders/WorkoutUploader.js'
