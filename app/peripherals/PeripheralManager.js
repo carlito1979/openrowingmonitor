@@ -40,7 +40,7 @@ function createPeripheralManager (config) {
   async function setupPeripherals () {
     await createBlePeripheral(config.bluetoothMode)
     await createHrmPeripheral(config.heartRateMode)
-    await createAntPeripheral(config.antplusMode)
+    await createAntPeripheral(config.antPlusMode)
   }
 
   // This function handles all incomming commands. As all commands are broadasted to all application parts,
@@ -165,7 +165,7 @@ function createPeripheralManager (config) {
     if (newMode === undefined) {
       newMode = antModes[(antModes.indexOf(antMode) + 1) % antModes.length]
     }
-    config.antplusMode = newMode
+    config.antPlusMode = newMode
     createAntPeripheral(newMode)
     isPeripheralChangeInProgress = false
   }
