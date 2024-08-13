@@ -277,7 +277,7 @@ function createPeripheralManager (config) {
             emitter.emit('heartRateMeasurement', heartRateMeasurement)
           }, 6000)
         }
-        // Make sure we check the HRM validity here, so the rest of the app doesn't have to																						   
+        // Make sure we check the HRM validity here, so the rest of the app doesn't have to   
         if (heartRateMeasurement.heartrate !== undefined && config.userSettings.restingHR <= heartRateMeasurement.heartrate && heartRateMeasurement.heartrate <= config.userSettings.maxHR) {
           emitter.emit('heartRateMeasurement', heartRateMeasurement)
         } else {
