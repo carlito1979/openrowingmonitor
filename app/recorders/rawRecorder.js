@@ -1,6 +1,6 @@
 'use strict'
 /*
-  Open Rowing Monitor, https://github.com/laberning/openrowingmonitor
+  Open Rowing Monitor, https://github.com/JaapvanEkris/openrowingmonitor
 
   This Module captures the metrics of a rowing session and persists them.
 */
@@ -15,24 +15,16 @@ function createRawRecorder (config) {
   let filename
   let allDataHasBeenWritten
 
-  // This function handles all incomming commands. As all commands are broadasted to all application parts,
-  // we need to filter here what the WorkoutRecorder will react to and what it will ignore
+  // This function handles all incomming commands. Here, the recordingmanager will have filtered
+  // all unneccessary commands for us, so we only need to react to 'reset' and 'shutdown'
   async function handleCommand (commandName) {
     switch (commandName) {
-      case ('start'):
-        break
-      case ('startOrResume'):
-        break
-      case ('pause'):
-        createRawDataFile()
-        break
-      case ('stop'):
-        createRawDataFile()
-        break
       case ('reset'):
         await createRawDataFile()
+        rotationImpulses = null
         rotationImpulses = []
         filename = undefined
+        allDataHasBeenWritten = true
         break
       case 'shutdown':
         await createRawDataFile()
@@ -52,6 +44,28 @@ function createRawRecorder (config) {
     // intermediate step of persisting to memory can lead to buffering issues that will mix up impulses in the recording !!!!
     await rotationImpulses.push(impulse)
     allDataHasBeenWritten = false
+  }
+
+  function recordRowingMetrics (metrics) {
+    switch (true) {
+      case (metrics.metricsContext.isSessionStop):
+        createRawDataFile()
+        setTimeout(recreateRawDataFile, 60000)
+        break
+      case (metrics.metricsContext.isPauseStart):
+        createRawDataFile()
+        setTimeout(recreateDataRawFile, 60000)
+        break
+    }
+  }
+
+  function recreateRawDataFile () {
+    // This function is called when the rowing session is stopped.
+    if (allDataHasBeenWritten) return
+
+    // Some data has been added after the last write
+    createRawDataFile()
+    setTimeout(recreateRawDataFile, 60000)
   }
 
   async function createRawDataFile () {
@@ -97,6 +111,7 @@ function createRawRecorder (config) {
   return {
     setBaseFileName,
     recordRotationImpulse,
+    recordRowingMetrics,
     handleCommand
   }
 }
