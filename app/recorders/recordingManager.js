@@ -1,9 +1,10 @@
 'use strict'
 /*
-  Open Rowing Monitor, https://github.com/laberning/openrowingmonitor
+  Open Rowing Monitor, https://github.com/JaapvanEkris/openrowingmonitor
 
   This Module captures the metrics of a rowing session and persists them.
 */
+
 import log from 'loglevel'
 import fs from 'fs/promises'
 import { createLogRecorder } from './logRecorder.js'
@@ -13,26 +14,23 @@ import { createRowingDataRecorder } from './rowingDataRecorder.js'
 
 function createRecordingManager (config) {
   let startTime
-  const logRecorder = createLogRecorder(config)
-  const rawRecorder = createRawRecorder(config)
-  const tcxRecorder = createTCXRecorder(config)
-  const rowingDataRecorder = createRowingDataRecorder(config)
+  let logRecorder = createLogRecorder(config)
+  let rawRecorder = createRawRecorder(config)
+  let tcxRecorder = createTCXRecorder(config)
+  let rowingDataRecorder = createRowingDataRecorder(config)
 
   // This function handles all incomming commands. As all commands are broadasted to all application parts,
   // we need to filter here what the WorkoutRecorder will react to and what it will ignore
+  // For the 'start', 'startOrResume', 'pause' and 'stop' commands, we await the official rowingengine reaction
   async function handleCommand (commandName) {
     switch (commandName) {
       case ('start'):
-        executeCommandsInParralel(commandName)
         break
       case ('startOrResume'):
-        executeCommandsInParralel(commandName)
         break
       case ('pause'):
-        executeCommandsInParralel(commandName)
         break
       case ('stop'):
-        executeCommandsInParralel(commandName)
         break
       case ('reset'):
         startTime = undefined
@@ -74,19 +72,15 @@ function createRecordingManager (config) {
       await nameFilesAndCreateDirectory()
     }
     logRecorder.recordRowingMetrics(metrics)
+    if (config.createRawDataFiles) { rawRecorder.recordRowingMetrics(metrics) }
     if (config.createTcxFiles) { tcxRecorder.recordRowingMetrics(metrics) }
     if (config.createRowingDataFiles) { rowingDataRecorder.recordRowingMetrics(metrics) }
-
-    if (config.createRawDataFiles && (metrics.metricsContext.isPauseStart || metrics.metricsContext.isSessionStop)) {
-      // As the rawRecorder isn't aware of any state, we explicitly need to tell it rowing has stopped
-      rawRecorder.handleCommand('stop')
-    }
   }
 
   async function recordHeartRate (heartRate) {
-    logRecorder.recordHeartRate(heartRate)
-    if (config.createTcxFiles) { tcxRecorder.recordHeartRate(heartRate) }
-    if (config.createRowingDataFiles) { rowingDataRecorder.recordHeartRate(heartRate) }
+      logRecorder.recordHeartRate(heartRate)
+      if (config.createTcxFiles) { tcxRecorder.recordHeartRate(heartRate) }
+      if (config.createRowingDataFiles) { rowingDataRecorder.recordHeartRate(heartRate) }
   }
 
   async function executeCommandsInParralel (commandName) {
