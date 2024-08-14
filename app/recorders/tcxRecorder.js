@@ -1,6 +1,6 @@
 'use strict'
 /*
-  Open Rowing Monitor, https://github.com/laberning/openrowingmonitor
+  Open Rowing Monitor, https://github.com/JaapvanEkris/openrowingmonitor
 
   This Module captures the metrics of a rowing session and persists them.
 */
@@ -17,32 +17,30 @@ function createTCXRecorder (config) {
   let heartRate = 0
   let strokes = []
   let postExerciseHR = []
+  let lastMetrics
   let startTime
   let allDataHasBeenWritten
 
-  // This function handles all incomming commands. As all commands are broadasted to all application parts,
-  // we need to filter here what the WorkoutRecorder will react to and what it will ignore
+  // This function handles all incomming commands. Here, the recordingmanager will have filtered
+  // all unneccessary commands for us, so we only need to react to 'reset' and 'shutdown'
   async function handleCommand (commandName) {
     switch (commandName) {
-      case ('start'):
-        break
-      case ('startOrResume'):
-        break
-      case ('pause'):
-        await createTcxFile()
-        break
-      case ('stop'):
-        createTcxFile()
-        break
       case ('reset'):
+        if (lastMetrics.length > 0 && lastMetrics.totalMovingTime > strokes[strokes.length - 1].totalMovingTime) {
+          addMetricsToStrokesArray(lastMetrics)
+        }
         await createTcxFile()
-        startTime = undefined
         heartRate = 0
+        strokes = null
         strokes = []
+        postExerciseHR = null
         postExerciseHR = []
-        // ToDo: stop the HRR recording
+        startTime = undefined
         break
       case 'shutdown':
+        if (lastMetrics.length > 0 && lastMetrics.totalMovingTime > strokes[strokes.length - 1].totalMovingTime) {
+          addMetricsToStrokesArray(lastMetrics)
+        }
         await createTcxFile()
         break
       default:
@@ -65,18 +63,23 @@ function createTCXRecorder (config) {
         break
       case (metrics.metricsContext.isSessionStop):
         addMetricsToStrokesArray(metrics)
-        postExerciseHR.splice(0, postExerciseHR.length)
+        postExerciseHR = null
+        postExerciseHR = []
+        createTcxFile()
         measureRecoveryHR()
         break
       case (metrics.metricsContext.isPauseStart):
         addMetricsToStrokesArray(metrics)
-        postExerciseHR.splice(0, postExerciseHR.length)
+        postExerciseHR = null
+        postExerciseHR = []
+        createTcxFile()
         measureRecoveryHR()
         break
       case (metrics.metricsContext.isDriveStart):
         addMetricsToStrokesArray(metrics)
         break
     }
+    lastMetrics = metrics
   }
 
   function addMetricsToStrokesArray (metrics) {
@@ -104,7 +107,7 @@ function createTCXRecorder (config) {
 
     // we need at least two strokes and ten seconds to generate a valid tcx file
     if (strokes.length < 2 || !minimumRecordingTimeHasPassed()) {
-      log.info('tcx file has not been written, as there were not enough strokes recorded (minimum 10 seconds and two strokes)')
+      log.info(`tcx file has not been written, as there were not enough strokes recorded (minimum 10 seconds and two strokes)`)
       return
     }
 
@@ -176,7 +179,7 @@ function createTCXRecorder (config) {
                 MaximumSpeed: (workout.strokes.map((stroke) => stroke.cycleLinearVelocity).reduce((acc, cycleLinearVelocity) => Math.max(acc, cycleLinearVelocity))).toFixed(2),
                 Calories: Math.round(lastStroke.totalCalories),
                 /* ToDo Fix issue with IF-statement not being accepted here?
-                if (lastStroke.heartrate !== undefined && lastStroke.heartrate > 30) {
+                if (lastStroke.heartrate !== undefined) {
                   AverageHeartRateBpm: VO2max.averageObservedHR(),
                   MaximumHeartRateBpm: VO2max.maxObservedHR,
                   //AverageHeartRateBpm: { Value: (workout.strokes.reduce((sum, s) => sum + s.heartrate, 0) / workout.strokes.length).toFixed(2) },
@@ -201,7 +204,7 @@ function createTCXRecorder (config) {
                           }
                         }
                       }
-                      if (stroke.heartrate !== undefined && stroke.heartrate > 30) {
+                      if (stroke.heartrate !== undefined) {
                         trackpoint.HeartRateBpm = { Value: stroke.heartrate }
                       }
                       return trackpoint
@@ -263,7 +266,7 @@ function createTCXRecorder (config) {
   function measureRecoveryHR () {
     // This function is called when the rowing session is stopped. postExerciseHR[0] is the last measured excercise HR
     // Thus postExerciseHR[1] is Recovery HR after 1 min, etc..
-    if (heartRate !== undefined) {
+    if (heartRate !== undefined && config.userSettings.restingHR <= heartRate &&  heartRate <= config.userSettings.maxHR) {
       log.debug(`*** HRR-${postExerciseHR.length}: ${heartRate}`)
       postExerciseHR.push(heartRate)
       if ((postExerciseHR.length > 1) && (postExerciseHR.length <= 4)) {
@@ -275,7 +278,7 @@ function createTCXRecorder (config) {
         // We haven't got three post-exercise HR measurements yet, let's schedule the next measurement
         setTimeout(measureRecoveryHR, 60000)
       } else {
-        log.debug('*** Skipped HRR measurement')
+      log.debug('*** Skipped HRR measurement')
       }
     }
   }
