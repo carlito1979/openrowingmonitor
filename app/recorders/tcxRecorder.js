@@ -107,7 +107,7 @@ function createTCXRecorder (config) {
 
     // we need at least two strokes and ten seconds to generate a valid tcx file
     if (strokes.length < 2 || !minimumRecordingTimeHasPassed()) {
-      log.info(`tcx file has not been written, as there were not enough strokes recorded (minimum 10 seconds and two strokes)`)
+      log.info('tcx file has not been written, as there were not enough strokes recorded (minimum 10 seconds and two strokes)')
       return
     }
 
@@ -266,7 +266,7 @@ function createTCXRecorder (config) {
   function measureRecoveryHR () {
     // This function is called when the rowing session is stopped. postExerciseHR[0] is the last measured excercise HR
     // Thus postExerciseHR[1] is Recovery HR after 1 min, etc..
-    if (heartRate !== undefined && config.userSettings.restingHR <= heartRate &&  heartRate <= config.userSettings.maxHR) {
+    if (heartRate !== undefined && config.userSettings.restingHR <= heartRate && heartRate <= config.userSettings.maxHR) {
       log.debug(`*** HRR-${postExerciseHR.length}: ${heartRate}`)
       postExerciseHR.push(heartRate)
       if ((postExerciseHR.length > 1) && (postExerciseHR.length <= 4)) {
@@ -278,7 +278,7 @@ function createTCXRecorder (config) {
         // We haven't got three post-exercise HR measurements yet, let's schedule the next measurement
         setTimeout(measureRecoveryHR, 60000)
       } else {
-      log.debug('*** Skipped HRR measurement')
+        log.debug('*** Skipped HRR measurement')
       }
     }
   }
