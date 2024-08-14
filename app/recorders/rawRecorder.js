@@ -54,7 +54,7 @@ function createRawRecorder (config) {
         break
       case (metrics.metricsContext.isPauseStart):
         createRawDataFile()
-        setTimeout(recreateDataRawFile, 60000)
+        setTimeout(recreateRawDataFile, 60000)
         break
     }
   }
