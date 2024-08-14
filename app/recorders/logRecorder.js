@@ -64,7 +64,7 @@ function createLogRecorder (config) {
   }
 
   function logMetrics (metrics) {
-    if (heartRate !== undefined && config.userSettings.restingHR <= heartRate &&  heartRate <= config.userSettings.maxHR) {
+    if (heartRate !== undefined && config.userSettings.restingHR <= heartRate && heartRate <= config.userSettings.maxHR) {
       log.info(`stroke: ${metrics.totalNumberOfStrokes}, dist: ${metrics.totalLinearDistance.toFixed(1)}m, heartrate ${heartRate} BPM` +
         `, pace: ${secondsToTimeString(metrics.cyclePace)}/500m, stroke dist: ${metrics.cycleDistance.toFixed(1)}m, strokerate: ${metrics.cycleStrokeRate.toFixed(1)} SPM` +
         `, drive dur: ${metrics.driveDuration.toFixed(2)}s, rec. dur: ${metrics.recoveryDuration.toFixed(2)}s, stroke dur: ${metrics.cycleDuration.toFixed(2)}s`)
