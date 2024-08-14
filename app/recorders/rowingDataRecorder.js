@@ -29,6 +29,11 @@ function createRowingDataRecorder (config) {
         await createRowingDataFile()
         filename = ''
         startTime = undefined
+        heartRate = 0
+        strokes = null
+        strokes = []
+        lastMetrics = null
+        allDataHasBeenWritten = true
         break
       case 'shutdown':
         if (lastMetrics.length > 0 && lastMetrics.totalMovingTime > strokes[strokes.length - 1].totalMovingTime) {
@@ -104,8 +109,6 @@ function createRowingDataRecorder (config) {
 
   async function createRowingDataFile () {
     let currentstroke
-    let trackPointTime
-    let timestamp
     let i
 
     // Do not write again if not needed
