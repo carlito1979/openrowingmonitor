@@ -14,10 +14,10 @@ import { createRowingDataRecorder } from './rowingDataRecorder.js'
 
 function createRecordingManager (config) {
   let startTime
-  let logRecorder = createLogRecorder(config)
-  let rawRecorder = createRawRecorder(config)
-  let tcxRecorder = createTCXRecorder(config)
-  let rowingDataRecorder = createRowingDataRecorder(config)
+  const logRecorder = createLogRecorder(config)
+  const rawRecorder = createRawRecorder(config)
+  const tcxRecorder = createTCXRecorder(config)
+  const rowingDataRecorder = createRowingDataRecorder(config)
 
   // This function handles all incomming commands. As all commands are broadasted to all application parts,
   // we need to filter here what the WorkoutRecorder will react to and what it will ignore
@@ -78,23 +78,17 @@ function createRecordingManager (config) {
   }
 
   async function recordHeartRate (heartRate) {
-      logRecorder.recordHeartRate(heartRate)
-      if (config.createTcxFiles) { tcxRecorder.recordHeartRate(heartRate) }
-      if (config.createRowingDataFiles) { rowingDataRecorder.recordHeartRate(heartRate) }
+    logRecorder.recordHeartRate(heartRate)
+    if (config.createTcxFiles) { tcxRecorder.recordHeartRate(heartRate) }
+    if (config.createRowingDataFiles) { rowingDataRecorder.recordHeartRate(heartRate) }
   }
 
   async function executeCommandsInParralel (commandName) {
     const parallelCalls = []
     parallelCalls.push(logRecorder.handleCommand(commandName))
-    if (config.createRawDataFiles) {
-      parallelCalls.push(rawRecorder.handleCommand(commandName))
-    }
-    if (config.createTcxFiles) {
-      parallelCalls.push(tcxRecorder.handleCommand(commandName))
-    }
-    if (config.createRowingDataFiles) {
-      parallelCalls.push(rowingDataRecorder.handleCommand(commandName))
-    }
+    if (config.createRawDataFiles) { parallelCalls.push(rawRecorder.handleCommand(commandName)) }
+    if (config.createTcxFiles) { parallelCalls.push(tcxRecorder.handleCommand(commandName)) }
+    if (config.createRowingDataFiles) { parallelCalls.push(rowingDataRecorder.handleCommand(commandName)) }
     await Promise.all(parallelCalls)
   }
 
