@@ -1,6 +1,6 @@
 'use strict'
 /*
-  Open Rowing Monitor, https://github.com/laberning/openrowingmonitor
+  Open Rowing Monitor, https://github.com/JaapvanEkris/openrowingmonitor
 
   This Module captures the metrics of a rowing session and persists them.
 */
@@ -15,31 +15,25 @@ function createRowingDataRecorder (config) {
   let startTime
   let heartRate = 0
   let strokes = []
+  let lastMetrics
   let allDataHasBeenWritten
 
   // This function handles all incomming commands. As all commands are broadasted to all application parts,
   // we need to filter here what the WorkoutRecorder will react to and what it will ignore
   async function handleCommand (commandName) {
     switch (commandName) {
-      case ('start'):
-        break
-      case ('startOrResume'):
-        break
-      case ('pause'):
-        createRowingDataFile()
-        break
-      case ('stop'):
-        createRowingDataFile()
-        break
       case ('reset'):
+        if (lastMetrics.length > 0 && lastMetrics.totalMovingTime > strokes[strokes.length - 1].totalMovingTime) {
+          addMetricsToStrokesArray(lastMetrics)
+        }
         await createRowingDataFile()
-        heartRate = 0
         filename = ''
         startTime = undefined
-        strokes = []
-        allDataHasBeenWritten = true
         break
       case 'shutdown':
+        if (lastMetrics.length > 0 && lastMetrics.totalMovingTime > strokes[strokes.length - 1].totalMovingTime) {
+          addMetricsToStrokesArray(lastMetrics)
+        }
         await createRowingDataFile()
         break
       default:
@@ -69,6 +63,9 @@ function createRowingDataRecorder (config) {
         addMetricsToStrokesArray(metrics)
         createRowingDataFile()
         break
+      case (metrics.metricsContext.isIntervalStart):
+        addMetricsToStrokesArray(metrics)
+        break
       case (metrics.metricsContext.isPauseStart):
         addMetricsToStrokesArray(metrics)
         createRowingDataFile()
@@ -77,19 +74,31 @@ function createRowingDataRecorder (config) {
         addMetricsToStrokesArray(metrics)
         break
     }
+    lastMetrics = metrics
   }
 
   function addMetricsToStrokesArray (metrics) {
     addHeartRateToMetrics(metrics)
+    addTimestampToMetrics(metrics)
     strokes.push(metrics)
     allDataHasBeenWritten = false
   }
 
   function addHeartRateToMetrics (metrics) {
-    if (heartRate !== undefined) {
+    if (heartRate !== undefined && heartRate > 30) {
       metrics.heartrate = heartRate
     } else {
       metrics.heartrate = undefined
+    }
+  }
+
+  function addTimestampToMetrics (metrics) {
+    if (metrics.totalMovingTime !== undefined) {
+      const trackPointTime = new Date(startTime.getTime() + metrics.totalMovingTime * 1000)
+      metrics.timestamp = trackPointTime.getTime() / 1000
+    } else {
+      const currentTime = new Date()
+      metrics.timestamp = currentTime.getTime() / 1000
     }
   }
 
@@ -109,7 +118,7 @@ function createRowingDataRecorder (config) {
     }
 
     // Required file header, please note this includes a typo and odd spaces as the specification demands it!
-    let RowingData = ',index, Stroke Number,TimeStamp (sec), ElapsedTime (sec), HRCur (bpm),DistanceMeters, Cadence (stokes/min), Stroke500mPace (sec/500m), Power (watts), StrokeDistance (meters),' +
+    let RowingData = ',index, Stroke Number, lapIdx,TimeStamp (sec), ElapsedTime (sec), HRCur (bpm),DistanceMeters, Cadence (stokes/min), Stroke500mPace (sec/500m), Power (watts), StrokeDistance (meters),' +
       ' DriveTime (ms), DriveLength (meters), StrokeRecoveryTime (ms),Speed, Horizontal (meters), Calories (kCal), DragFactor, PeakDriveForce (N), AverageDriveForce (N),' +
       'Handle_Force_(N),Handle_Velocity_(m/s),Handle_Power_(W)\n'
 
@@ -117,11 +126,9 @@ function createRowingDataRecorder (config) {
     i = 0
     while (i < strokes.length) {
       currentstroke = strokes[i]
-      trackPointTime = new Date(startTime.getTime() + currentstroke.totalMovingTime * 1000)
-      timestamp = trackPointTime.getTime() / 1000
       // Add the strokes
-      RowingData += `${currentstroke.totalNumberOfStrokes.toFixed(0)},${currentstroke.totalNumberOfStrokes.toFixed(0)},${currentstroke.totalNumberOfStrokes.toFixed(0)},${timestamp.toFixed(5)},` +
-        `${currentstroke.totalMovingTime.toFixed(5)},${(currentstroke.heartrate > 30 ? currentstroke.heartrate.toFixed(0) : NaN)},${currentstroke.totalLinearDistance.toFixed(1)},` +
+      RowingData += `${currentstroke.totalNumberOfStrokes.toFixed(0)},${currentstroke.totalNumberOfStrokes.toFixed(0)},${currentstroke.totalNumberOfStrokes.toFixed(0)},${currentstroke.intervalNumber.toFixed(0)},${currentstroke.timestamp.toFixed(5)},` +
+        `${currentstroke.totalMovingTime.toFixed(5)},${(currentstroke.heartrate !== undefined ? currentstroke.heartrate.toFixed(0) : NaN)},${currentstroke.totalLinearDistance.toFixed(1)},` +
         `${currentstroke.cycleStrokeRate.toFixed(1)},${(currentstroke.totalNumberOfStrokes > 0 ? currentstroke.cyclePace.toFixed(2) : NaN)},${(currentstroke.totalNumberOfStrokes > 0 ? currentstroke.cyclePower.toFixed(0) : NaN)},` +
         `${currentstroke.cycleDistance.toFixed(2)},${(currentstroke.driveDuration * 1000).toFixed(0)},${(currentstroke.totalNumberOfStrokes > 0 ? currentstroke.driveLength.toFixed(2) : NaN)},${(currentstroke.recoveryDuration * 1000).toFixed(0)},` +
         `${(currentstroke.totalNumberOfStrokes > 0 ? currentstroke.cycleLinearVelocity.toFixed(2) : 0)},${currentstroke.totalLinearDistance.toFixed(1)},${currentstroke.totalCalories.toFixed(1)},${currentstroke.dragFactor.toFixed(1)},` +
